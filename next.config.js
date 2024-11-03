@@ -1,6 +1,10 @@
-// import "../src/utils/env.js/index.js";
+/**
+ * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
+ * for Docker builds.
+ */
+import "./src/env.js";
 
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
   experimental: {
@@ -8,4 +12,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config;
