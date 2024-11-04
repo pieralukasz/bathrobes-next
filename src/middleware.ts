@@ -1,44 +1,19 @@
-import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { type NextRequest } from "next/server";
+import { updateSession } from "./lib/utils/supabase/middleware";
 
-export const middleware = async (request: NextRequest) => {
-  try {
-    // Create an initial response that we may modify
-    const response = NextResponse.next();
+export async function middleware(request: NextRequest) {
+  return await updateSession(request);
+}
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll: () => request.cookies.getAll(),
-          setAll: (cookiesToSet) => {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options),
-            );
-          },
-        },
-      },
-    );
-
-    // Refresh session if expired, per Supabase documentation
-    const { data: user, error } = await supabase.auth.getUser();
-
-    // Redirect to sign-in if the user is not authenticated on protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && error) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-
-    // Redirect authenticated users from the root to a protected page
-    if (request.nextUrl.pathname === "/" && !error) {
-      return NextResponse.redirect(new URL("/protected", request.url));
-    }
-
-    // Return the potentially modified response
-    return response;
-  } catch (e) {
-    console.error("Supabase client creation failed:", e);
-    // Return unmodified response in case of an error
-    return NextResponse.next();
-  }
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
