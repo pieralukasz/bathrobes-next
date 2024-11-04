@@ -7,5 +7,6 @@ import { actionClient } from "~/lib/safe-action";
 export const signOutAction = actionClient.action(async () => {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  return redirect("/sign-in");
+
+  return redirect("/login");
 });

@@ -22,5 +22,5 @@ export const signInAction = actionClient
       return encodedRedirect("error", "/login", error.message);
     }
 
-    return redirect("/protected");
+    return redirect("/");
   });

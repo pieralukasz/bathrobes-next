@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "~/components/ui/input";
-import Link from "next/link";
 import {
   Form,
   FormField,
@@ -24,7 +23,7 @@ export const SignInForm = () => {
       },
       actionProps: {
         onSuccess: () => {
-          window.alert("Logged in successfully!");
+          window.alert("You've got mail!");
           resetFormAndAction();
         },
       },
@@ -38,18 +37,8 @@ export const SignInForm = () => {
     <Form {...form}>
       <form
         onSubmit={handleSubmitWithAction}
-        className="flex min-w-64 flex-1 flex-col gap-3"
+        className="flex w-full flex-1 flex-col gap-3"
       >
-        <h1 className="text-2xl font-medium">Sign in</h1>
-        <p className="text-sm text-foreground">
-          Don't have an account?{" "}
-          <Link
-            className="font-medium text-foreground underline"
-            href="/sign-up"
-          >
-            Sign up
-          </Link>
-        </p>
         <FormField
           control={form.control}
           name="email"
@@ -57,7 +46,7 @@ export const SignInForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="email" {...field} />
+                <Input placeholder="ll@bathrobe.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
