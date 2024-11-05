@@ -25,7 +25,7 @@ export const CategoryProductsList: React.FC<
           variant="outline"
           className="px-6 py-3 text-lg font-medium transition-colors hover:bg-primary hover:text-primary-foreground"
         >
-          <Link href={`/category/${product.id}`}>{product.name}</Link>
+          <Link href={`/product/${product.id}`}>{product.name}</Link>
         </Button>
       ))}
     </div>
