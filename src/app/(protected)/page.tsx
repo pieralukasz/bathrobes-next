@@ -1,9 +1,8 @@
-import { CategoriesList } from "./components/categories-list";
+import { CategoriesList } from "~/features/products/components/categories-list";
 
-export default async function HomePage() {
+export default async function Categories() {
   return (
     <div className="mx-auto w-full">
-      <h1 className="mb-6 text-center text-3xl font-bold">Categories</h1>
       <CategoriesList />
     </div>
   );

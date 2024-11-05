@@ -18,6 +18,7 @@ const updatedAt = timestamp("updated_at", { withTimezone: true }).$onUpdate(
 export const categories = pgTable("ll-bathrobes_categories", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: varchar("name", { length: 256 }).notNull(),
+  slug: varchar("slug", { length: 256 }).notNull(),
   createdAt,
   updatedAt,
 });
@@ -25,6 +26,7 @@ export const categories = pgTable("ll-bathrobes_categories", {
 export const products = pgTable("ll-bathrobes_products", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: varchar("name", { length: 256 }).notNull(),
+  slug: varchar("slug", { length: 256 }).notNull(),
   categoryId: integer("category_id")
     .references(() => categories.id)
     .notNull(),
@@ -38,6 +40,7 @@ export const productColors = pgTable("ll-bathrobes_product_colors", {
     .references(() => products.id)
     .notNull(),
   color: varchar("color", { length: 50 }).notNull(),
+  imageUrl: varchar("image_url", { length: 256 }),
   createdAt,
   updatedAt,
 });

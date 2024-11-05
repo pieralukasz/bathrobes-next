@@ -47,17 +47,9 @@ export default function RootLayout({
                 {children}
               </div>
 
-              <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs">
+              <footer className="mx-auto mt-auto flex w-full items-center justify-center gap-2 border-t py-4 text-center text-xs">
                 <p>
-                  Powered by{" "}
-                  <a
-                    href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-                    target="_blank"
-                    className="font-bold hover:underline"
-                    rel="noreferrer"
-                  >
-                    Pieras
-                  </a>
+                  Powered by <span className="font-bold">Lucas Piera</span>
                 </p>
                 <ThemeSwitcher />
               </footer>

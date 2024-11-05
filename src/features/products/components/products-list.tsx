@@ -5,15 +5,22 @@ import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
 import { products } from "~/server/db/schema";
 
-interface CategoryProductsListProps {
-  categoryId: string;
+interface ProductsListProps {
+  categoryId: number;
 }
 
-export const CategoryProductsList: React.FC<
-  CategoryProductsListProps
-> = async ({ categoryId }) => {
+export const ProductsList: React.FC<ProductsListProps> = async ({
+  categoryId,
+}) => {
+  if (Number.isNaN(categoryId)) {
+    notFound();
+  }
+
   const categoryProducts = await db.query.products.findMany({
-    where: eq(products.categoryId, parseInt(categoryId)),
+    where: eq(products.categoryId, categoryId),
+    with: {
+      colors: true,
+    },
   });
 
   return (
@@ -25,7 +32,7 @@ export const CategoryProductsList: React.FC<
           variant="outline"
           className="px-6 py-3 text-lg font-medium transition-colors hover:bg-primary hover:text-primary-foreground"
         >
-          <Link href={`/product/${product.id}`}>{product.name}</Link>
+          <Link href={`/product/${product.slug}`}>{product.name}</Link>
         </Button>
       ))}
     </div>

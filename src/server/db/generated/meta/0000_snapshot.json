@@ -1,5 +1,5 @@
 {
-  "id": "3c7d184d-a237-4a7a-ae6b-53fbad7988ac",
+  "id": "dd364f8b-f525-498e-b211-fb894f701e4b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -150,6 +150,12 @@
         },
         "name": {
           "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
@@ -331,6 +337,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "image_url": {
+          "name": "image_url",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -485,6 +497,12 @@
         },
         "name": {
           "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true

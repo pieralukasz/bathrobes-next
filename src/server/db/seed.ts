@@ -1,3 +1,4 @@
+import { slugCreator } from "~/lib/utils";
 import { db } from ".";
 import { categories, products, productColors, productSizes } from "./schema";
 import { getXMLProducts } from "./utils";
@@ -30,7 +31,7 @@ async function seed() {
     if (!categoryMap.has(categoryName)) {
       const [category] = await db
         .insert(categories)
-        .values({ name: categoryName })
+        .values({ name: categoryName, slug: slugCreator(categoryName) })
         .onConflictDoNothing()
         .returning({ id: categories.id });
       categoryId = category?.id;
@@ -44,7 +45,7 @@ async function seed() {
     if (!productMap.has(name)) {
       const [product] = await db
         .insert(products)
-        .values({ name, categoryId })
+        .values({ name, categoryId, slug: slugCreator(name) })
         .onConflictDoNothing()
         .returning({ id: products.id });
       productId = product?.id;

@@ -6,16 +6,12 @@ import { notFound } from "next/navigation";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ productId: string }>;
+  params: Promise<{ productSlug: string }>;
 }) {
-  const productId = (await params).productId;
-
-  if (Number.isNaN(Number(productId))) {
-    notFound();
-  }
+  const productSlug = (await params).productSlug;
 
   const product = await db.query.products.findFirst({
-    where: eq(products.id, Number(productId)),
+    where: eq(products.slug, productSlug),
     with: {
       category: true,
       colors: {
