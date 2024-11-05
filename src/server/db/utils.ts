@@ -1,6 +1,23 @@
 import { parseStringPromise } from "xml2js";
 import { env } from "~/env";
-import { ParsedProduct, RawProduct } from "~/types/product";
+
+export interface RawProduct {
+  $: { EAN: string };
+  NazwaKategorii: string[];
+  Nazwa: string[];
+  Kolor: string[];
+  Rozmiar: string[];
+  Ilość: string[];
+}
+
+export interface ParsedProduct {
+  ean: string;
+  name: string;
+  categoryName: string;
+  color: string;
+  size: string;
+  quantity: number;
+}
 
 export async function parseXml(xmlURL: string): Promise<any> {
   try {

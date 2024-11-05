@@ -23,17 +23,35 @@ export const categories = createTable("categories", {
   updatedAt,
 });
 
-export const products = createTable(
-  "products",
+export const products = createTable("products", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar("name", { length: 256 }).notNull(),
+  categoryId: integer("category_id")
+    .references(() => categories.id)
+    .notNull(),
+  createdAt,
+  updatedAt,
+});
+
+export const productColors = createTable("product_colors", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  productId: integer("product_id")
+    .references(() => products.id)
+    .notNull(),
+  color: varchar("color", { length: 50 }).notNull(),
+  createdAt,
+  updatedAt,
+});
+
+export const productSizes = createTable(
+  "product_sizes",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    ean: varchar("ean", { length: 13 }).notNull(),
-    name: varchar("name", { length: 256 }).notNull(),
-    categoryId: integer("category_id")
-      .references(() => categories.id)
+    colorId: integer("color_id")
+      .references(() => productColors.id)
       .notNull(),
-    color: varchar("color", { length: 50 }).notNull(),
     size: varchar("size", { length: 50 }).notNull(),
+    ean: varchar("ean", { length: 13 }).notNull(),
     quantity: integer("quantity").notNull(),
     createdAt,
     updatedAt,
@@ -57,8 +75,8 @@ export const basketItems = createTable("basket_items", {
   basketId: integer("basket_id")
     .references(() => baskets.id, { onDelete: "cascade" })
     .notNull(),
-  productId: integer("product_id")
-    .references(() => products.id)
+  productSizeId: integer("product_size_id")
+    .references(() => productSizes.id)
     .notNull(),
   quantity: integer("quantity").notNull(),
 });
@@ -75,8 +93,8 @@ export const orderItems = createTable("order_items", {
   orderId: integer("order_id")
     .references(() => orders.id, { onDelete: "cascade" })
     .notNull(),
-  productId: integer("product_id")
-    .references(() => products.id)
+  productSizeId: integer("product_size_id")
+    .references(() => productSizes.id)
     .notNull(),
   quantity: integer("quantity").notNull(),
 });

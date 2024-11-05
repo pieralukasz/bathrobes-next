@@ -1,5 +1,5 @@
 {
-  "id": "5b0805ad-d92b-4e88-99ca-0fce26ad3364",
+  "id": "3c7d184d-a237-4a7a-ae6b-53fbad7988ac",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -31,8 +31,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "product_id": {
-          "name": "product_id",
+        "product_size_id": {
+          "name": "product_size_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -59,12 +59,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "ll-bathrobes_basket_items_product_id_ll-bathrobes_products_id_fk": {
-          "name": "ll-bathrobes_basket_items_product_id_ll-bathrobes_products_id_fk",
+        "ll-bathrobes_basket_items_product_size_id_ll-bathrobes_product_sizes_id_fk": {
+          "name": "ll-bathrobes_basket_items_product_size_id_ll-bathrobes_product_sizes_id_fk",
           "tableFrom": "ll-bathrobes_basket_items",
-          "tableTo": "ll-bathrobes_products",
+          "tableTo": "ll-bathrobes_product_sizes",
           "columnsFrom": [
-            "product_id"
+            "product_size_id"
           ],
           "columnsTo": [
             "id"
@@ -202,8 +202,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "product_id": {
-          "name": "product_id",
+        "product_size_id": {
+          "name": "product_size_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -230,12 +230,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "ll-bathrobes_order_items_product_id_ll-bathrobes_products_id_fk": {
-          "name": "ll-bathrobes_order_items_product_id_ll-bathrobes_products_id_fk",
+        "ll-bathrobes_order_items_product_size_id_ll-bathrobes_product_sizes_id_fk": {
+          "name": "ll-bathrobes_order_items_product_size_id_ll-bathrobes_product_sizes_id_fk",
           "tableFrom": "ll-bathrobes_order_items",
-          "tableTo": "ll-bathrobes_products",
+          "tableTo": "ll-bathrobes_product_sizes",
           "columnsFrom": [
-            "product_id"
+            "product_size_id"
           ],
           "columnsTo": [
             "id"
@@ -298,8 +298,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.ll-bathrobes_products": {
-      "name": "ll-bathrobes_products",
+    "public.ll-bathrobes_product_colors": {
+      "name": "ll-bathrobes_product_colors",
       "schema": "",
       "columns": {
         "id": {
@@ -309,7 +309,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "ll-bathrobes_products_id_seq",
+            "name": "ll-bathrobes_product_colors_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -319,20 +319,8 @@
             "cycle": false
           }
         },
-        "ean": {
-          "name": "ean",
-          "type": "varchar(13)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "category_id": {
-          "name": "category_id",
+        "product_id": {
+          "name": "product_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -343,9 +331,77 @@
           "primaryKey": false,
           "notNull": true
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ll-bathrobes_product_colors_product_id_ll-bathrobes_products_id_fk": {
+          "name": "ll-bathrobes_product_colors_product_id_ll-bathrobes_products_id_fk",
+          "tableFrom": "ll-bathrobes_product_colors",
+          "tableTo": "ll-bathrobes_products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ll-bathrobes_product_sizes": {
+      "name": "ll-bathrobes_product_sizes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "ll-bathrobes_product_sizes_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "color_id": {
+          "name": "color_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "size": {
           "name": "size",
           "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ean": {
+          "name": "ean",
+          "type": "varchar(13)",
           "primaryKey": false,
           "notNull": true
         },
@@ -385,6 +441,74 @@
           "with": {}
         }
       },
+      "foreignKeys": {
+        "ll-bathrobes_product_sizes_color_id_ll-bathrobes_product_colors_id_fk": {
+          "name": "ll-bathrobes_product_sizes_color_id_ll-bathrobes_product_colors_id_fk",
+          "tableFrom": "ll-bathrobes_product_sizes",
+          "tableTo": "ll-bathrobes_product_colors",
+          "columnsFrom": [
+            "color_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ll-bathrobes_products": {
+      "name": "ll-bathrobes_products",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "ll-bathrobes_products_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
       "foreignKeys": {
         "ll-bathrobes_products_category_id_ll-bathrobes_categories_id_fk": {
           "name": "ll-bathrobes_products_category_id_ll-bathrobes_categories_id_fk",

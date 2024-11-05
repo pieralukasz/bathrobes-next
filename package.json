@@ -4,6 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check": "next lint && tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run ./src/server/db/seed.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
