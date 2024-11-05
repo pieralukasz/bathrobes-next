@@ -22,9 +22,5 @@ export default async function Page({
     notFound();
   }
 
-  if (category.products.length === 1 && category.products[0]?.slug) {
-    redirect(`/product/${category.products[0].slug}`);
-  }
-
   return <ProductsList categoryId={category.id} />;
 }

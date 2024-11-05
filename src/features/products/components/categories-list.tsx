@@ -5,6 +5,9 @@ import { db } from "~/server/db";
 export const CategoriesList = async () => {
   const categories = await db.query.categories.findMany({
     orderBy: (categories, { desc }) => [desc(categories.createdAt)],
+    with: {
+      products: true,
+    },
   });
 
   return (
@@ -16,7 +19,15 @@ export const CategoriesList = async () => {
           variant="outline"
           className="px-6 py-3 text-lg font-medium transition-colors hover:bg-primary hover:text-primary-foreground"
         >
-          <Link href={`/category/${category.slug}`}>{category.name}</Link>
+          <Link
+            href={
+              category.products.length === 1 && category.products[0]
+                ? `/product/${category.products[0].slug}`
+                : `/category/${category.slug}`
+            }
+          >
+            {category.name}
+          </Link>
         </Button>
       ))}
     </div>
