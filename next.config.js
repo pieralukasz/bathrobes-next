@@ -9,6 +9,7 @@ const config = {
   reactStrictMode: true,
   experimental: {
     appDocumentPreloading: true,
+    dynamicIO: true,
   },
 };
 

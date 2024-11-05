@@ -3,6 +3,8 @@ import { ThemeSwitcher } from "~/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
+import { Suspense } from "react";
+
 import "../styles/globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -36,7 +38,9 @@ export default function RootLayout({
                   <div className="flex items-center gap-5 font-semibold">
                     <Link href={"/"}>L&L Bathrobes</Link>
                   </div>
-                  <HeaderAuth />
+                  <Suspense fallback={null}>
+                    <HeaderAuth />
+                  </Suspense>
                 </div>
               </nav>
               <div className="flex max-w-5xl flex-col gap-20 p-5">
@@ -52,7 +56,7 @@ export default function RootLayout({
                     className="font-bold hover:underline"
                     rel="noreferrer"
                   >
-                    Supabase
+                    Pieras
                   </a>
                 </p>
                 <ThemeSwitcher />

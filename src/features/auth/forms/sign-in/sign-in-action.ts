@@ -1,6 +1,5 @@
 "use server";
 
-import { encodedRedirect } from "~/lib/utils/utils";
 import { createClient } from "~/lib/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { actionClient } from "~/lib/safe-action";
@@ -19,7 +18,7 @@ export const signInAction = actionClient
     });
 
     if (error) {
-      return encodedRedirect("error", "/login", error.message);
+      return redirect("/login");
     }
 
     return redirect("/");
