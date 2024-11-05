@@ -8,7 +8,7 @@ export const CategoriesList = async () => {
   });
 
   return (
-    <div className="flex flex-wrap justify-center gap-4">
+    <div className="flex flex-wrap justify-center gap-4 pt-5">
       {categories.map((category) => (
         <Button
           key={category.id}

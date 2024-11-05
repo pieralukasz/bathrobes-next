@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "../../../components/ui/button";
 import { createClient } from "~/lib/utils/supabase/server";
 import { SignOutForm } from "~/features/auth/forms/sign-out/sign-out-form";
 
@@ -12,7 +12,8 @@ export default async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!{/* <SignOutForm /> */}
+      Hey, {user.email}!
+      <SignOutForm />
     </div>
   ) : (
     <Button asChild size="sm" variant={"outline"}>

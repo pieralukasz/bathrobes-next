@@ -2,6 +2,8 @@ import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { products } from "~/server/db/schema";
 import { notFound } from "next/navigation";
+import { ProductDetails } from "~/features/products/components/product/product-details";
+import { Suspense } from "react";
 
 export default async function Page({
   params,
@@ -26,24 +28,5 @@ export default async function Page({
     notFound();
   }
 
-  return (
-    <div>
-      <h1>{product.name}</h1>
-      <p>Category: {product.category.name}</p>
-      <div>
-        {product.colors.map((color) => (
-          <div key={color.id}>
-            <h2>{color.color}</h2>
-            <ul>
-              {color.sizes.map((size) => (
-                <li key={size.id}>
-                  {size.size} - {size.ean} - {size.quantity}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <ProductDetails product={product} />;
 }
