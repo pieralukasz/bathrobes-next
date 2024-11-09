@@ -1,4 +1,4 @@
-import HeaderAuth from "~/features/auth/components/header-auth";
+import { HeaderAuth } from "~/features/auth/components/header-auth";
 import { ThemeSwitcher } from "~/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import "../styles/globals.css";
+import { Basket } from "~/features/products/components/basket/basket";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -39,7 +40,9 @@ export default function RootLayout({
                     <Link href={"/"}>L&L Bathrobes</Link>
                   </div>
                   <Suspense fallback={null}>
-                    <HeaderAuth />
+                    <HeaderAuth>
+                      <Basket />
+                    </HeaderAuth>
                   </Suspense>
                 </div>
               </nav>
