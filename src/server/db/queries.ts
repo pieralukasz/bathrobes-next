@@ -1,4 +1,5 @@
 import { db } from ".";
+import { eq } from "drizzle-orm";
 import { categories, products, productColors, productSizes } from "./schema";
 
 // Fetch all categories
@@ -14,7 +15,7 @@ export async function getAllCategories() {
 // Fetch a single category by ID
 export async function getCategoryById(id: number) {
   return await db.query.categories.findFirst({
-    where: (categories) => categories.id.eq(id),
+    where: (categories) => eq(categories.id, id),
     with: {
       products: true,
     },
@@ -34,7 +35,7 @@ export async function getAllProducts() {
 // Fetch a single product by ID
 export async function getProductById(id: number) {
   return await db.query.products.findFirst({
-    where: (products) => products.id.eq(id),
+    where: (products) => eq(products.id, id),
     with: {
       colors: true,
     },
@@ -54,7 +55,7 @@ export async function getAllProductColors() {
 // Fetch a single product color by ID
 export async function getProductColorById(id: number) {
   return await db.query.productColors.findFirst({
-    where: (productColors) => productColors.id.eq(id),
+    where: (productColors) => eq(productColors.id, id),
     with: {
       sizes: true,
     },
@@ -71,6 +72,6 @@ export async function getAllProductSizes() {
 // Fetch a single product size by ID
 export async function getProductSizeById(id: number) {
   return await db.query.productSizes.findFirst({
-    where: (productSizes) => productSizes.id.eq(id),
+    where: (productSizes) => eq(productSizes.id, id),
   });
 }
