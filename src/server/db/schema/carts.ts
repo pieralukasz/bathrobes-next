@@ -29,12 +29,6 @@ export const basketItems = table(
   }),
 );
 
-export type InferBasket = typeof baskets.$inferSelect & {
-  items: (typeof basketItems.$inferSelect & {
-    productSize: InferProductSize;
-  })[];
-};
+export type InferBasket = typeof baskets.$inferSelect;
 
-export type InferBasketItem = typeof basketItems.$inferSelect & {
-  productSize: InferProductSize;
-};
+export type InferBasketItem = typeof basketItems.$inferSelect;

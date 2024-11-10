@@ -99,18 +99,3 @@ export const clearCartAction = actionClient.action(async () => {
     return { error: "Error clearing cart" };
   }
 });
-
-export const redirectToCheckoutAction = actionClient.action(async () => {
-  try {
-    const user = await getUser();
-    if (!user) return redirect("/login");
-
-    const cart = await getCart(user.id);
-    if (!cart) return redirect("/");
-
-    return redirect("/checkout");
-  } catch (e) {
-    console.error(e);
-    return redirect("/");
-  }
-});

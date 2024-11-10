@@ -1,11 +1,7 @@
 import { db } from "..";
 import { eq } from "drizzle-orm";
 
-import type { InferBasket } from "../schema";
-
-export async function getCart(
-  userId: string,
-): Promise<InferBasket | undefined> {
+export async function getCart(userId: string) {
   return await db.query.baskets.findFirst({
     where: (baskets) => eq(baskets.userId, userId),
     with: {
@@ -25,6 +21,9 @@ export async function getCart(
     },
   });
 }
+
+export type CartWithDetails = NonNullable<Awaited<ReturnType<typeof getCart>>>;
+export type CartWithDetailsItem = CartWithDetails["items"][number];
 
 export async function getCartByUserId(userId: string) {
   return await db.query.baskets.findFirst({

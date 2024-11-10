@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, use, useContext, useMemo, useOptimistic } from "react";
+import { CartWithDetails, CartWithDetailsItem } from "~/server/db/queries/cart";
+import { ProductWithDetails } from "~/server/db/queries/product";
 import { InferProductSize } from "~/server/db/schema";
-import type { InferBasket, InferBasketItem } from "~/server/db/schema/carts";
 
 type UpdateType = "plus" | "minus" | "delete";
 
@@ -20,22 +21,24 @@ type CartAction =
         productSizeId: number;
         quantity: number;
         productSize: InferProductSize;
+        product: ProductWithDetails;
       };
     };
 
 type CartContextType = {
-  cart: InferBasket | undefined;
+  cart: CartWithDetails | undefined;
   updateCartItem: (basketItemId: number, updateType: UpdateType) => void;
   addCartItem: (
     productSizeId: number,
     quantity: number,
-    productSize: InferBasketItem["productSize"],
+    productSize: InferProductSize,
+    product: ProductWithDetails,
   ) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-function createEmptyCart(userId: string): InferBasket {
+function createEmptyCart(userId: string): CartWithDetails {
   return {
     id: 0,
     userId,
@@ -47,9 +50,9 @@ function createEmptyCart(userId: string): InferBasket {
 }
 
 function cartReducer(
-  state: InferBasket | undefined,
+  state: CartWithDetails | undefined,
   action: CartAction,
-): InferBasket {
+): CartWithDetails {
   const currentCart = state || createEmptyCart("");
 
   switch (action.type) {
@@ -72,7 +75,7 @@ function cartReducer(
             quantity: newQuantity,
           };
         })
-        .filter(Boolean) as InferBasketItem[];
+        .filter(Boolean) as CartWithDetailsItem[];
 
       return {
         ...currentCart,
@@ -81,12 +84,11 @@ function cartReducer(
     }
 
     case "ADD_ITEM": {
-      const { productSizeId, quantity, productSize } = action.payload;
+      const { productSizeId, quantity, productSize, product } = action.payload;
       const existingItem = currentCart.items.find(
         (item) => item.productSizeId === productSizeId,
       );
 
-      console.log(existingItem);
       if (existingItem) {
         return {
           ...currentCart,
@@ -98,7 +100,19 @@ function cartReducer(
         };
       }
 
-      const newItem: InferBasketItem = {
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      const color = product?.colors.find(
+        (color) => color.id === productSize.colorId,
+      );
+
+      if (!color) {
+        throw new Error("Color not found");
+      }
+
+      const newItem: CartWithDetailsItem = {
         id: Math.random(),
         basketId: currentCart.id,
         productSizeId,
@@ -106,7 +120,13 @@ function cartReducer(
         createdAt: new Date(),
         updatedAt: null,
         deletedAt: null,
-        productSize,
+        productSize: {
+          ...productSize,
+          color: {
+            ...color,
+            product,
+          },
+        },
       };
 
       return {
@@ -125,7 +145,7 @@ export function CartProvider({
   cartPromise,
 }: {
   children: React.ReactNode;
-  cartPromise: Promise<InferBasket | undefined>;
+  cartPromise: Promise<CartWithDetails | undefined>;
 }) {
   const initialCart = use(cartPromise);
   const [optimisticCart, updateOptimisticCart] = useOptimistic(
@@ -144,14 +164,13 @@ export function CartProvider({
     productSizeId: number,
     quantity: number,
     productSize: InferProductSize,
+    product: ProductWithDetails,
   ) => {
     updateOptimisticCart({
       type: "ADD_ITEM",
-      payload: { productSizeId, quantity, productSize },
+      payload: { productSizeId, quantity, productSize, product },
     });
   };
-
-  console.log(optimisticCart, "CART");
 
   const value = useMemo(
     () => ({

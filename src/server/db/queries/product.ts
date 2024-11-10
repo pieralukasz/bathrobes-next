@@ -56,9 +56,7 @@ export async function getProduct(
   });
 }
 
-export async function getProductBySlug(
-  slug: string,
-): Promise<InferProduct | undefined> {
+export async function getProductBySlug(slug: string) {
   return await db.query.products.findFirst({
     where: (products) => eq(products.slug, slug),
     with: {
@@ -71,6 +69,8 @@ export async function getProductBySlug(
     },
   });
 }
+
+export type ProductWithDetails = Awaited<ReturnType<typeof getProductBySlug>>;
 
 export async function getProductRecommendations(categoryId: number) {
   return await db.query.products.findMany({

@@ -1,4 +1,4 @@
-import { CategoriesList } from "~/features/product/components/categories-list";
+import { CategoriesList } from "~/features/product/categories-list";
 
 export default async function Categories() {
   return (

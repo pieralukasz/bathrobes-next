@@ -13,7 +13,7 @@ import { Button } from "~/components/ui/button";
 import { signInFormSchema } from "./schema";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signInAction } from "./forms/sign-in/sign-in-action";
+import { signInAction } from "./actions";
 
 export const SignInForm = () => {
   const { form, handleSubmitWithAction, resetFormAndAction } =

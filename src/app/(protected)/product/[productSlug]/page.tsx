@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ProductDetails } from "~/features/product/components/product/product-details";
+import { ProductDetails } from "~/features/product/product-details";
 import { getProductBySlug } from "~/server/db/queries/product";
 
 export default async function Page({

@@ -12,6 +12,7 @@ import { getCart } from "~/server/db/queries/cart";
 import { CartProvider } from "~/features/cart/cart-context";
 import { createClient, getUser } from "~/lib/supabase/server";
 import { SignOutButton } from "~/features/auth/sign-out-button";
+import { CartModal } from "~/features/cart/cart-modal";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -51,7 +52,7 @@ export default async function RootLayout({
                     </div>
                     <Suspense fallback={null}>
                       <HeaderAuth>
-                        <Basket />
+                        <CartModal />
                       </HeaderAuth>
                     </Suspense>
                   </div>
@@ -62,7 +63,7 @@ export default async function RootLayout({
                     Powered by <span className="font-bold">Lucas Piera</span>
                   </p>
                   <ThemeSwitcher />
-                  <SignOutButton />
+                  {user?.id && <SignOutButton />}
                 </footer>
               </div>
             </main>

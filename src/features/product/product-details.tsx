@@ -11,17 +11,21 @@ import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
 import { Input } from "~/components/ui/input";
-import { InferProduct } from "~/server/db/schema";
 import { useMemo, useState } from "react";
 import { AddToCart } from "~/features/cart/add-to-cart";
+import { ProductWithDetails } from "~/server/db/queries/product";
 
 interface ProductDetailsProps {
-  product: InferProduct;
+  product: ProductWithDetails;
 }
 
 // TODO: rewrite it to use react hook form
 
 export const ProductDetails = ({ product }: ProductDetailsProps) => {
+  if (!product) {
+    return null;
+  }
+
   const [selectedColor, setSelectedColor] = useState(product.colors[0]?.color);
 
   const sizes = useMemo(() => {
@@ -98,7 +102,9 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
                 className="w-24"
               />
             </div>
-            {sizes[0] && <AddToCart productSize={sizes[0]} quantity={1} />}
+            {sizes[0] && (
+              <AddToCart product={product} size={sizes[0]} quantity={1} />
+            )}
           </CardContent>
         </div>
       </div>
