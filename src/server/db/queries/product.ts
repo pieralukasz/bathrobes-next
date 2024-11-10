@@ -21,10 +21,23 @@ export async function getCategoryById(id: number) {
   });
 }
 
-// Fetch all products
-export async function getAllProducts() {
+// Fetch products with optional query, sort, and reverse
+export async function getProducts({
+  query,
+  reverse = false,
+  sortKey = "createdAt",
+}: {
+  query?: string;
+  reverse?: boolean;
+  sortKey?: string;
+}): Promise<any[]> {
+  const orderDirection = reverse ? "asc" : "desc";
+
   return await db.query.products.findMany({
-    orderBy: (products, { desc }) => [desc(products.createdAt)],
+    where: query
+      ? (products) => products.name.ilike(`%${query}%`)
+      : undefined,
+    orderBy: (products, { [orderDirection]: order }) => [order(products[sortKey])],
     with: {
       colors: true,
     },
