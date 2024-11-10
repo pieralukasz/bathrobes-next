@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createClient } from "~/lib/utils/supabase/server";
+import { createClient } from "~/lib/supabase/server";
 import { actionClient } from "~/lib/safe-action";
 
 export const signOutAction = actionClient.action(async () => {

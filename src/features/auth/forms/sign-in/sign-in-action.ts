@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "~/lib/utils/supabase/server";
+import { createClient } from "~/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { actionClient } from "~/lib/safe-action";
 import { signInFormSchema } from "./schema";
