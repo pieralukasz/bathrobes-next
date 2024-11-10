@@ -2,14 +2,14 @@ import { notFound } from "next/navigation";
 import { ProductDetails } from "~/features/product/product-details";
 import { getProductBySlug } from "~/server/db/queries/product";
 
-export default async function Page({
+export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ productSlug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const productSlug = (await params).productSlug;
+  const slug = (await params).slug;
 
-  const product = await getProductBySlug(productSlug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();

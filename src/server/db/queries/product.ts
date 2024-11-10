@@ -56,6 +56,7 @@ export async function getProduct(
   });
 }
 
+export type ProductWithDetails = Awaited<ReturnType<typeof getProductBySlug>>;
 export async function getProductBySlug(slug: string) {
   return await db.query.products.findFirst({
     where: (products) => eq(products.slug, slug),
@@ -69,8 +70,6 @@ export async function getProductBySlug(slug: string) {
     },
   });
 }
-
-export type ProductWithDetails = Awaited<ReturnType<typeof getProductBySlug>>;
 
 export async function getProductRecommendations(categoryId: number) {
   return await db.query.products.findMany({
