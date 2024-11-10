@@ -1,7 +1,7 @@
 import { pgTable as table } from "drizzle-orm/pg-core";
 import * as t from "drizzle-orm/pg-core";
 import { timestamps } from "./timestamp";
-import { categories } from "./categories";
+import { InferCategory, categories } from "./categories";
 
 export const products = table("products", {
   id: t.integer("id").primaryKey().generatedByDefaultAsIdentity(),
@@ -40,17 +40,13 @@ export const productSizes = table("product_sizes", {
   ...timestamps,
 });
 
-export type InferProductColor = typeof productColors.$inferSelect & {
-  sizes: (typeof productSizes.$inferSelect)[];
-};
-
-export type InferProductSize = typeof productSizes.$inferSelect & {
-  color: InferProductColor;
-};
-
 export type InferProduct = typeof products.$inferSelect & {
-  category: typeof categories.$inferSelect;
-  colors: (typeof productColors.$inferSelect & {
-    sizes: (typeof productSizes.$inferSelect)[];
-  })[];
+  category: InferCategory;
+  colors: InferProductColor[];
 };
+
+export type InferProductColor = typeof productColors.$inferSelect & {
+  sizes: InferProductSize[];
+};
+
+export type InferProductSize = typeof productSizes.$inferSelect;

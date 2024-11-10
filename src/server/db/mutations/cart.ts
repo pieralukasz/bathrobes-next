@@ -1,5 +1,5 @@
 import { db } from "..";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { baskets, basketItems } from "../schema";
 
 export async function createCart(userId: string) {
@@ -10,16 +10,19 @@ export async function addToCart(
   basketId: number,
   lines: { productSizeId: number; quantity: number }[],
 ) {
-  return await db
+  const values = lines.map((line) => ({
+    basketId,
+    productSizeId: line.productSizeId,
+    quantity: line.quantity,
+  }));
+
+  await db
     .insert(basketItems)
-    .values(
-      lines.map((line) => ({
-        basketId,
-        productSizeId: line.productSizeId,
-        quantity: line.quantity,
-      })),
-    )
-    .returning();
+    .values(values)
+    .onConflictDoUpdate({
+      target: [basketItems.basketId, basketItems.productSizeId],
+      set: { quantity: sql`${basketItems.quantity} + 1` },
+    });
 }
 
 export async function removeFromCart(basketItemIds: number[]) {

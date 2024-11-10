@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, use, useContext, useMemo, useOptimistic } from "react";
+import { InferProductSize } from "~/server/db/schema";
 import type { InferBasket, InferBasketItem } from "~/server/db/schema/carts";
 
 type UpdateType = "plus" | "minus" | "delete";
@@ -18,8 +19,7 @@ type CartAction =
       payload: {
         productSizeId: number;
         quantity: number;
-        // Include the full data structure that matches your schema
-        productSize: InferBasketItem["productSize"];
+        productSize: InferProductSize;
       };
     };
 
@@ -86,6 +86,7 @@ function cartReducer(
         (item) => item.productSizeId === productSizeId,
       );
 
+      console.log(existingItem);
       if (existingItem) {
         return {
           ...currentCart,
@@ -142,13 +143,15 @@ export function CartProvider({
   const addCartItem = (
     productSizeId: number,
     quantity: number,
-    productSize: InferBasketItem["productSize"],
+    productSize: InferProductSize,
   ) => {
     updateOptimisticCart({
       type: "ADD_ITEM",
       payload: { productSizeId, quantity, productSize },
     });
   };
+
+  console.log(optimisticCart, "CART");
 
   const value = useMemo(
     () => ({

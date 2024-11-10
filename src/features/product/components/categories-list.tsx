@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { db } from "~/server/db";
+import { getCategories } from "~/server/db/queries/product";
 
 export const CategoriesList = async () => {
-  const categories = await db.query.categories.findMany({
-    orderBy: (categories, { desc }) => [desc(categories.createdAt)],
-    with: {
-      products: true,
-    },
-  });
+  const categories = await getCategories();
 
   return (
     <div className="flex flex-wrap justify-center gap-4 pt-5">

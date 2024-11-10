@@ -1,8 +1,17 @@
 import { db } from "..";
 import { eq } from "drizzle-orm";
-import { products } from "../schema";
+import { InferProduct, products } from "../schema";
 
 type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
+
+export async function getCategories() {
+  return await db.query.categories.findMany({
+    orderBy: (categories, { asc }) => asc(categories.name),
+    with: {
+      products: true,
+    },
+  });
+}
 
 export async function getProducts({
   categoryId,
@@ -31,9 +40,27 @@ export async function getProducts({
   });
 }
 
-export async function getProduct(id: number) {
+export async function getProduct(
+  id: number,
+): Promise<InferProduct | undefined> {
   return await db.query.products.findFirst({
     where: (products) => eq(products.id, id),
+    with: {
+      category: true,
+      colors: {
+        with: {
+          sizes: true,
+        },
+      },
+    },
+  });
+}
+
+export async function getProductBySlug(
+  slug: string,
+): Promise<InferProduct | undefined> {
+  return await db.query.products.findFirst({
+    where: (products) => eq(products.slug, slug),
     with: {
       category: true,
       colors: {

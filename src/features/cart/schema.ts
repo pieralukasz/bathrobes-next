@@ -1,5 +1,9 @@
 import * as z from "zod";
 
+export const createCartSchema = z.object({
+  userId: z.string(),
+});
+
 export const addToCartSchema = z.object({
   productSizeId: z.number(),
   quantity: z.number().min(1),

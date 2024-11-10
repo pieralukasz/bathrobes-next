@@ -1,9 +1,6 @@
-import { db } from "~/server/db";
-import { eq } from "drizzle-orm";
-import { products } from "~/server/db/schema";
 import { notFound } from "next/navigation";
 import { ProductDetails } from "~/features/product/components/product/product-details";
-import { Suspense } from "react";
+import { getProductBySlug } from "~/server/db/queries/product";
 
 export default async function Page({
   params,
@@ -12,17 +9,7 @@ export default async function Page({
 }) {
   const productSlug = (await params).productSlug;
 
-  const product = await db.query.products.findFirst({
-    where: eq(products.slug, productSlug),
-    with: {
-      category: true,
-      colors: {
-        with: {
-          sizes: true,
-        },
-      },
-    },
-  });
+  const product = await getProductBySlug(productSlug);
 
   if (!product) {
     notFound();

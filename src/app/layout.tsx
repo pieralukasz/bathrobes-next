@@ -10,6 +10,7 @@ import { Basket } from "~/features/product/components/basket/basket";
 import { cookies } from "next/headers";
 import { getCart } from "~/server/db/queries/cart";
 import { CartProvider } from "~/features/cart/cart-context";
+import { createClient, getUser } from "~/lib/supabase/server";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -26,8 +27,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const userId = (await cookies()).get("userId")?.value;
-  const cartPromise = userId ? getCart(userId) : Promise.resolve(undefined);
+  const user = await getUser();
+
+  console.log("user", user);
+
+  const cartPromise = user ? getCart(user.id) : Promise.resolve(undefined);
 
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>
