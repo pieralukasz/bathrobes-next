@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "~/components/ui/button";
-import { signOutAction } from "./sign-out-action";
+import { signOutAction } from "./actions";
 import { useAction } from "next-safe-action/hooks";
 
-export const SignOutForm = () => {
+export const SignOutButton = () => {
   const { execute } = useAction(signOutAction);
 
   return (

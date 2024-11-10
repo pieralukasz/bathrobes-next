@@ -1,4 +1,4 @@
-import { HeaderAuth } from "~/features/auth/components/header-auth";
+import { HeaderAuth } from "~/features/auth/header-auth";
 import { ThemeSwitcher } from "~/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
@@ -6,11 +6,12 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import "../styles/globals.css";
-import { Basket } from "~/features/product/components/basket/basket";
+import { Basket } from "~/features/cart/basket";
 import { cookies } from "next/headers";
 import { getCart } from "~/server/db/queries/cart";
 import { CartProvider } from "~/features/cart/cart-context";
 import { createClient, getUser } from "~/lib/supabase/server";
+import { SignOutButton } from "~/features/auth/sign-out-button";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -28,8 +29,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const user = await getUser();
-
-  console.log("user", user);
 
   const cartPromise = user ? getCart(user.id) : Promise.resolve(undefined);
 
@@ -63,6 +62,7 @@ export default async function RootLayout({
                     Powered by <span className="font-bold">Lucas Piera</span>
                   </p>
                   <ThemeSwitcher />
+                  <SignOutButton />
                 </footer>
               </div>
             </main>

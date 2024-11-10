@@ -6,8 +6,6 @@ import { useCart } from "~/features/cart/cart-context";
 export const Basket = () => {
   const { cart } = useCart();
 
-  console.log(cart, "BAKSET");
-
   return (
     <div className="flex items-center gap-2">
       <ShoppingBasket size={16} />

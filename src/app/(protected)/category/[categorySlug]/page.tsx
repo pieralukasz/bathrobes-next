@@ -1,4 +1,4 @@
-import { ProductsList } from "~/features/product/components/products-list";
+import { ProductsList } from "~/features/product/products-list";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { categories } from "~/server/db/schema";

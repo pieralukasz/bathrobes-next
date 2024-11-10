@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { db } from "~/server/db";
 import { products } from "~/server/db/schema";
-import { ProductCard } from "./product/product-card";
+import { ProductCard } from "./product-card";
 
 interface ProductsListProps {
   categoryId: number;

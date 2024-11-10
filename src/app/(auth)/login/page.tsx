@@ -1,4 +1,4 @@
-import { SignInForm } from "~/features/auth/forms/sign-in/sign-in-form";
+import { SignInForm } from "~/features/auth/sign-in-form";
 
 export default async function Login() {
   return (

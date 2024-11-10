@@ -1,7 +1,7 @@
 "use server";
 
-import { createClient } from "~/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { createClient } from "~/lib/supabase/server";
 import { actionClient } from "~/lib/safe-action";
 import { signInFormSchema } from "./schema";
 
@@ -23,3 +23,10 @@ export const signInAction = actionClient
 
     return redirect("/");
   });
+
+export const signOutAction = actionClient.action(async () => {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+
+  return redirect("/login");
+});
