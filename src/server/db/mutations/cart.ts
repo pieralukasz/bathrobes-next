@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { basketItems, baskets } from "../schema";
+import { basketItems } from "../schema/baskets";
 
 // Add an item to the cart
 export async function addItemToCart(

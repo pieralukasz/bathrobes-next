@@ -1,5 +1,5 @@
+import { eq } from "drizzle-orm";
 import { db } from "..";
-import { baskets, basketItems, productSizes, products } from "../schema";
 
 // Fetch all items in a cart
 export async function getCartItems(basketId: number) {

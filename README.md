@@ -4,12 +4,12 @@ This project is a modern web application built with Next.js, Supabase, and Drizz
 
 ## Features
 
+- **TypeScript**: Fully typed for better developer experience and code reliability.
 - **Next.js App Router**: Utilizes the latest Next.js features for efficient routing and rendering.
 - **Supabase Authentication**: Implements a secure sign-in system using Supabase.
 - **Drizzle ORM**: Integrates Drizzle for database operations with PostgreSQL.
 - **Tailwind CSS**: Styled with Tailwind CSS for a responsive and customizable UI.
 - **shadcn/ui Components**: Incorporates shadcn/ui for pre-built, customizable React components.
-- **TypeScript**: Fully typed for better developer experience and code reliability.
 
 ## Getting Started
 

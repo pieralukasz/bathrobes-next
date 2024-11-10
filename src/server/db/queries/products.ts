@@ -1,7 +1,6 @@
 import { db } from "..";
 import { eq } from "drizzle-orm";
 
-// Fetch all categories
 export async function getAllCategories() {
   return await db.query.categories.findMany({
     orderBy: (categories, { desc }) => [desc(categories.createdAt)],
@@ -21,35 +20,35 @@ export async function getCategoryById(id: number) {
   });
 }
 
-// Fetch products with optional query, sort, and reverse
-export async function getProducts({
-  query,
-  reverse = false,
-  sortKey = "createdAt",
-}: {
-  query?: string;
-  reverse?: boolean;
-  sortKey?: string;
-}): Promise<any[]> {
-  const orderDirection = reverse ? "asc" : "desc";
-
+// Fetch all products
+export async function getAllProducts() {
   return await db.query.products.findMany({
-    where: query
-      ? (products) => products.name.ilike(`%${query}%`)
-      : undefined,
-    orderBy: (products, { [orderDirection]: order }) => [order(products[sortKey])],
+    orderBy: (products, { desc }) => [desc(products.createdAt)],
     with: {
       colors: true,
     },
   });
 }
 
-// Fetch a single product by ID
 export async function getProductById(id: number) {
   return await db.query.products.findFirst({
     where: (products) => eq(products.id, id),
     with: {
       colors: true,
+    },
+  });
+}
+
+export async function getProductsByCategory(categoryId: number) {
+  return await db.query.products.findMany({
+    where: (products) => eq(products.categoryId, categoryId),
+    with: {
+      category: true,
+      colors: {
+        with: {
+          sizes: true,
+        },
+      },
     },
   });
 }

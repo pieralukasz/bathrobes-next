@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db } from "..";
 import { orders, orderItems, productSizes, products } from "../schema";
 

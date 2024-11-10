@@ -1,7 +1,8 @@
 import { slugCreator } from "~/lib/utils";
 import { db } from ".";
-import { categories, products, productColors, productSizes } from "./schema";
 import { getXMLProducts } from "./utils";
+import { categories } from "./schema/categories";
+import { productColors, productSizes, products } from "./schema/products";
 
 async function seed() {
   console.log("Starting the seed process...");
