@@ -3,13 +3,25 @@ import { eq } from "drizzle-orm";
 import { categories, products, productColors, productSizes } from "./schema";
 
 // Create a new category
-export async function createCategory(name: string, slug: string) {
-  return await db.insert(categories).values({ name, slug }).returning();
+export async function createCategory(name: string, slug: string, sortOrder: number = 0) {
+  return await db.insert(categories).values({ name, slug, sortOrder }).returning();
 }
 
 // Update an existing category
-export async function updateCategory(id: number, name: string, slug: string) {
-  return await db.update(categories).set({ name, slug }).where(eq(categories.id, id)).returning();
+export async function updateCategory(id: number, name: string, slug: string, sortOrder?: number) {
+  const updateData: { name: string; slug: string; sortOrder?: number } = { name, slug };
+  if (typeof sortOrder !== 'undefined') {
+    updateData.sortOrder = sortOrder;
+  }
+  return await db.update(categories).set(updateData).where(eq(categories.id, id)).returning();
+}
+
+// Update category sort order
+export async function updateCategorySortOrder(id: number, sortOrder: number) {
+  return await db.update(categories)
+    .set({ sortOrder })
+    .where(eq(categories.id, id))
+    .returning();
 }
 
 // Delete a category

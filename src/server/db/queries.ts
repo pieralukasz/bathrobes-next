@@ -5,7 +5,7 @@ import { categories, products, productColors, productSizes } from "./schema";
 // Fetch all categories
 export async function getAllCategories() {
   return await db.query.categories.findMany({
-    orderBy: (categories, { desc }) => [desc(categories.createdAt)],
+    orderBy: (categories, { asc }) => [asc(categories.sortOrder), asc(categories.name)],
     with: {
       products: true,
     },

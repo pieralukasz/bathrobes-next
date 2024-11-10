@@ -19,6 +19,7 @@ export const categories = pgTable("ll-bathrobes_categories", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   name: varchar("name", { length: 256 }).notNull(),
   slug: varchar("slug", { length: 256 }).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
   createdAt,
   updatedAt,
 });
