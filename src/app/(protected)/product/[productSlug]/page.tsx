@@ -2,7 +2,7 @@ import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { products } from "~/server/db/schema";
 import { notFound } from "next/navigation";
-import { ProductDetails } from "~/features/products/components/product/product-details";
+import { ProductDetails } from "~/features/product/components/product/product-details";
 import { Suspense } from "react";
 
 export default async function Page({

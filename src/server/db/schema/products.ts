@@ -40,6 +40,17 @@ export const productSizes = table("product_sizes", {
   ...timestamps,
 });
 
-export type InferProduct = typeof products.$inferSelect;
-export type InferProductColor = typeof productColors.$inferSelect;
-export type InferProductSize = typeof productSizes.$inferSelect;
+export type InferProductColor = typeof productColors.$inferSelect & {
+  sizes: (typeof productSizes.$inferSelect)[];
+};
+
+export type InferProductSize = typeof productSizes.$inferSelect & {
+  color: InferProductColor;
+};
+
+export type InferProduct = typeof products.$inferSelect & {
+  category: typeof categories.$inferSelect;
+  colors: (typeof productColors.$inferSelect & {
+    sizes: (typeof productSizes.$inferSelect)[];
+  })[];
+};

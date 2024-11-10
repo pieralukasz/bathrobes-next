@@ -1,16 +1,23 @@
-import { eq } from "drizzle-orm";
 import { db } from "..";
+import { eq } from "drizzle-orm";
 
-// Fetch all items in a cart
-export async function getCartItems(basketId: number) {
-  return await db.query.basketItems.findMany({
-    where: (basketItems) => eq(basketItems.basketId, basketId),
+import type { InferBasket } from "../schema";
+
+export async function getCart(
+  userId: string,
+): Promise<InferBasket | undefined> {
+  return await db.query.baskets.findFirst({
+    where: (baskets) => eq(baskets.userId, userId),
     with: {
-      productSize: {
+      items: {
         with: {
-          color: {
+          productSize: {
             with: {
-              product: true,
+              color: {
+                with: {
+                  product: true,
+                },
+              },
             },
           },
         },
@@ -19,7 +26,6 @@ export async function getCartItems(basketId: number) {
   });
 }
 
-// Fetch a single cart by user ID
 export async function getCartByUserId(userId: string) {
   return await db.query.baskets.findFirst({
     where: (baskets) => eq(baskets.userId, userId),

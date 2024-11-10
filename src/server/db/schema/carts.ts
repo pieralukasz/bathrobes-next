@@ -1,7 +1,7 @@
 import { pgTable as table } from "drizzle-orm/pg-core";
 import * as t from "drizzle-orm/pg-core";
 import { timestamps } from "./timestamp";
-import { productSizes } from "./products";
+import { InferProductSize, productSizes } from "./products";
 
 export const baskets = table("baskets", {
   id: t.integer("id").primaryKey().generatedByDefaultAsIdentity(),
@@ -23,5 +23,12 @@ export const basketItems = table("basket_items", {
   ...timestamps,
 });
 
-export type InferBasket = typeof baskets.$inferSelect;
-export type InferBasketItem = typeof basketItems.$inferSelect;
+export type InferBasket = typeof baskets.$inferSelect & {
+  items: (typeof basketItems.$inferSelect & {
+    productSize: InferProductSize;
+  })[];
+};
+
+export type InferBasketItem = typeof basketItems.$inferSelect & {
+  productSize: InferProductSize;
+};

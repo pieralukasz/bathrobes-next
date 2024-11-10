@@ -1,34 +1,49 @@
-import { eq } from "drizzle-orm";
 import { db } from "..";
-import { basketItems } from "../schema/baskets";
+import { eq, inArray } from "drizzle-orm";
+import { baskets, basketItems } from "../schema";
 
-// Add an item to the cart
-export async function addItemToCart(
+export async function createCart(userId: string) {
+  return await db.insert(baskets).values({ userId }).returning();
+}
+
+export async function addToCart(
   basketId: number,
-  productSizeId: number,
-  quantity: number,
+  lines: { productSizeId: number; quantity: number }[],
 ) {
   return await db
     .insert(basketItems)
-    .values({ basketId, productSizeId, quantity })
+    .values(
+      lines.map((line) => ({
+        basketId,
+        productSizeId: line.productSizeId,
+        quantity: line.quantity,
+      })),
+    )
     .returning();
 }
 
-// Update the quantity of an item in the cart
-export async function updateCartItem(basketItemId: number, quantity: number) {
-  return await db
-    .update(basketItems)
-    .set({ quantity })
-    .where(eq(basketItems.id, basketItemId))
-    .returning();
+export async function removeFromCart(basketItemIds: number[]) {
+  if (basketItemIds.length === 1 && basketItemIds[0]) {
+    return await db
+      .delete(basketItems)
+      .where(eq(basketItems.id, basketItemIds[0]))
+      .returning();
+  } else {
+    return await db
+      .delete(basketItems)
+      .where(inArray(basketItems.id, basketItemIds))
+      .returning();
+  }
 }
+export async function updateCart(lines: { id: number; quantity: number }[]) {
+  const updates = lines.map((line) =>
+    db
+      .update(basketItems)
+      .set({ quantity: line.quantity })
+      .where(eq(basketItems.id, line.id)),
+  );
 
-// Remove an item from the cart
-export async function removeItemFromCart(basketItemId: number) {
-  return await db.delete(basketItems).where(eq(basketItems.id, basketItemId));
-}
-
-// Clear all items from a cart
-export async function clearCart(basketId: number) {
-  return await db.delete(basketItems).where(eq(basketItems.basketId, basketId));
+  return await db.transaction(async (tx) => {
+    return Promise.all(updates.map((update) => tx.execute(update)));
+  });
 }
