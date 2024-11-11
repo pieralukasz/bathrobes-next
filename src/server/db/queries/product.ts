@@ -1,8 +1,14 @@
 import { db } from "..";
 import { eq } from "drizzle-orm";
-import { InferProduct, products } from "../schema";
+import { InferProduct } from "../schema";
 
 type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
+
+export async function getCategory(slug: string) {
+  return await db.query.categories.findFirst({
+    where: (categories) => eq(categories.slug, slug),
+  });
+}
 
 export async function getCategories() {
   return await db.query.categories.findMany({

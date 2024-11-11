@@ -13,6 +13,8 @@ import { CartProvider } from "~/features/cart/cart-context";
 import { createClient, getUser } from "~/lib/supabase/server";
 import { SignOutButton } from "~/features/auth/sign-out-button";
 import { CartModal } from "~/features/cart/cart-modal";
+import { Footer } from "~/components/footer";
+import { Navbar } from "~/components/navbar/navbar";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -43,30 +45,11 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <CartProvider cartPromise={cartPromise}>
-            <main className="flex min-h-screen flex-col items-center">
-              <div className="flex w-full flex-1 flex-col items-center gap-4">
-                <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
-                  <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
-                    <div className="flex items-center gap-5 font-semibold">
-                      <Link href={"/"}>L&L Bathrobes</Link>
-                    </div>
-                    <Suspense fallback={null}>
-                      <HeaderAuth>
-                        <CartModal />
-                      </HeaderAuth>
-                    </Suspense>
-                  </div>
-                </nav>
-                <div className="flex max-w-5xl flex-col p-5">{children}</div>
-                <footer className="mx-auto mt-auto flex w-full items-center justify-center gap-2 border-t py-4 text-center text-xs">
-                  <p>
-                    Powered by <span className="font-bold">Lucas Piera</span>
-                  </p>
-                  <ThemeSwitcher />
-                  {user?.id && <SignOutButton />}
-                </footer>
-              </div>
-            </main>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex flex-grow">{children}</main>
+              <Footer />
+            </div>
           </CartProvider>
         </ThemeProvider>
       </body>

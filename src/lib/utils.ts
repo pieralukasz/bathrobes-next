@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
-import { redirect } from "next/navigation";
+import { ReadonlyURLSearchParams, redirect } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,3 +20,13 @@ export function encodedRedirect(
 ) {
   return redirect(`${path}?${type}=${encodeURIComponent(message)}`);
 }
+
+export const createUrl = (
+  pathname: string,
+  params: URLSearchParams | ReadonlyURLSearchParams,
+) => {
+  const paramsString = params.toString();
+  const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
+
+  return `${pathname}${queryString}`;
+};

@@ -1,9 +1,7 @@
-import { CategoriesList } from "~/features/product/categories-list";
-
-export default async function Categories() {
+export default async function HomePage() {
   return (
-    <div className="pt-2">
-      <CategoriesList />
+    <div className="flex flex-grow items-center justify-center">
+      <p>Here will be a carousel</p>
     </div>
   );
 }

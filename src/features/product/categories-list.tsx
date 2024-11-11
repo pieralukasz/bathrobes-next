@@ -1,30 +1,48 @@
-import Link from "next/link";
-import { Button } from "~/components/ui/button";
+import { Suspense } from "react";
+import { FilterList } from "~/components/search";
+import { cn } from "~/lib/utils";
+
 import { getCategories } from "~/server/db/queries/product";
 
-export const CategoriesList = async () => {
+async function CategoriesList() {
   const categories = await getCategories();
 
+  const all = {
+    title: "All",
+    path: "/search",
+  };
+
+  const mappedCategories = categories.map((category) => ({
+    title: category.name,
+    path: `/search/${category.slug}`,
+  }));
+
+  return <FilterList list={[all, ...mappedCategories]} title="Categories" />;
+}
+
+const skeleton = "mb-3 h-4 w-5/6 animate-pulse rounded";
+const activeAndTitles = "bg-neutral-800 dark:bg-neutral-300";
+const items = "bg-neutral-400 dark:bg-neutral-700";
+
+export const Categories = () => {
   return (
-    <div className="flex flex-wrap justify-center gap-4 pt-5">
-      {categories.map((category) => (
-        <Button
-          key={category.id}
-          asChild
-          variant="outline"
-          className="px-6 py-3 text-lg font-medium transition-colors hover:bg-primary hover:text-primary-foreground"
-        >
-          <Link
-            href={
-              category.products.length === 1 && category.products[0]
-                ? `/product/${category.products[0].slug}`
-                : `/category/${category.slug}`
-            }
-          >
-            {category.name}
-          </Link>
-        </Button>
-      ))}
-    </div>
+    <Suspense
+      fallback={
+        <div className="col-span-2 hidden h-[400px] w-full flex-none py-4 lg:block">
+          <div className={cn(skeleton, activeAndTitles)} />
+          <div className={cn(skeleton, activeAndTitles)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+          <div className={cn(skeleton, items)} />
+        </div>
+      }
+    >
+      <CategoriesList />
+    </Suspense>
   );
 };
