@@ -23,6 +23,12 @@ type CartAction =
         productSize: InferProductSize;
         product: ProductWithDetails;
       };
+    }
+  | {
+      type: "DELETE_ITEM";
+      payload: {
+        basketItemId: number;
+      };
     };
 
 type CartContextType = {
@@ -34,6 +40,7 @@ type CartContextType = {
     productSize: InferProductSize,
     product: ProductWithDetails,
   ) => void;
+  deleteCartItem: (basketItemId: number) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -80,6 +87,14 @@ function cartReducer(
       return {
         ...currentCart,
         items: updatedItems,
+      };
+    }
+
+    case "DELETE_ITEM": {
+      const { basketItemId } = action.payload;
+      return {
+        ...currentCart,
+        items: currentCart.items.filter((item) => item.id !== basketItemId),
       };
     }
 
@@ -160,6 +175,13 @@ export function CartProvider({
     });
   };
 
+  const deleteCartItem = (basketItemId: number) => {
+    updateOptimisticCart({
+      type: "DELETE_ITEM",
+      payload: { basketItemId },
+    });
+  };
+
   const addCartItem = (
     productSizeId: number,
     quantity: number,
@@ -176,6 +198,7 @@ export function CartProvider({
     () => ({
       cart: optimisticCart,
       updateCartItem,
+      deleteCartItem,
       addCartItem,
     }),
     [optimisticCart],

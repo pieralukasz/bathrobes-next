@@ -40,9 +40,13 @@ export const CartModal = () => {
       </SheetTrigger>
       <SheetContent className="w-[90vw] px-0 sm:w-[540px]">
         <SheetHeader className="px-4">
-          <SheetTitle>Your Cart</SheetTitle>
+          <SheetTitle>
+            Your cart {cart.items.length ? "" : "is empty"}
+          </SheetTitle>
           <SheetDescription>
-            Review your items and checkout when you're ready.
+            {cart.items.length
+              ? "Review your items and proceed to checkout"
+              : "Add items to your cart to get started"}
           </SheetDescription>
         </SheetHeader>
         <CartItems onItemClick={() => setIsOpen(false)} />
@@ -53,6 +57,7 @@ export const CartModal = () => {
               setIsOpen(false);
             }}
             className="w-full"
+            disabled={!cart.items.length}
           >
             Go to checkout
           </Button>

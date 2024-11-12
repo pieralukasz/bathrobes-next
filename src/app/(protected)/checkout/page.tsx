@@ -1,28 +1,22 @@
-"use client";
-import { Button } from "~/components/ui/button";
+import { redirect } from "next/navigation";
 import { CartItems } from "~/features/cart/cart-items";
-import { useCart } from "~/features/cart/cart-context";
-import { useAction } from "next-safe-action/hooks";
-import { checkoutAction } from "~/features/cart/actions";
-import { useRouter } from "next/navigation";
 
-export default function CheckoutPage() {
-  const { cart } = useCart();
-  const { execute, result } = useAction(checkoutAction);
-  const router = useRouter();
+import { CreateOrder } from "~/features/cart/create-order";
+import { getUser } from "~/lib/supabase/server";
+import { getCart } from "~/server/db/queries/cart";
 
-  if (!cart) {
-    return null;
+export default async function CheckoutPage() {
+  const user = await getUser();
+
+  if (!user) {
+    redirect("/login");
   }
 
-  const handleCheckout = async () => {
-    try {
-      execute();
-      router.push("/");
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const cart = await getCart(user.id);
+
+  if (!cart) {
+    redirect("/search");
+  }
 
   return (
     <div className="flex w-full flex-col px-4 sm:w-[540px]">
@@ -31,17 +25,7 @@ export default function CheckoutPage() {
         <p>Review your items and proceed to checkout when you're ready.</p>
       </div>
       <CartItems />
-      <span className="text-center">
-        You'll receive an email with your order details.
-      </span>
-      {result.data?.error && (
-        <p className="text-center text-red-500">{result.data.error}</p>
-      )}
-      <div className="flex justify-center py-4">
-        <Button onClick={handleCheckout} className="w-[320px]">
-          Order now
-        </Button>
-      </div>
+      <CreateOrder />
     </div>
   );
 }

@@ -44,7 +44,16 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
     defaultValues: {
       color: product.colors[0]?.color || "",
       size: product.colors[0]?.sizes[0]?.size || "",
-      quantity: 1,
+      quantity: (() => {
+        const initialColor = product.colors[0];
+        const initialSize = initialColor?.sizes[0];
+        if (!cart || !initialColor || !initialSize) return 1;
+
+        const existingItem = cart.items.find(
+          (item) => item.productSizeId === initialSize.id,
+        );
+        return existingItem?.quantity || 1;
+      })(),
     },
   });
 

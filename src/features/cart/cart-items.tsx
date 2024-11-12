@@ -1,19 +1,33 @@
 "use client";
 
 import Link from "next/link";
+import { X } from "lucide-react";
 import { useCart } from "./cart-context";
 import { createUrl } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import { useAction } from "next-safe-action/hooks";
+import { removeItemAction } from "./actions";
 
 interface CartItemsProps {
   onItemClick?: () => void;
 }
 
 export const CartItems = ({ onItemClick }: CartItemsProps) => {
-  const { cart } = useCart();
+  const { cart, deleteCartItem } = useCart();
+
+  const { execute, status } = useAction(removeItemAction);
 
   if (!cart) {
     return null;
   }
+
+  const handleRemove = async (e: React.MouseEvent, basketItemId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    deleteCartItem(basketItemId);
+    await execute({ basketItemId });
+  };
 
   return (
     <div className="flex h-[calc(100%-128px)] flex-col justify-between overflow-hidden">
@@ -35,13 +49,22 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
                   onClick={onItemClick}
                   className="flex flex-row items-center justify-start"
                 >
-                  <div className="relative w-16 overflow-hidden rounded-md border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
+                  <div className="relative w-16 border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
                     <img
                       src="https://alfxflqvzegvbpsvtzih.supabase.co/storage/v1/object/public/photos/2018_patti_grafit.png"
                       // alt={product.productSize.color.imageUrl}
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute -left-2 -top-2 h-6 w-6 rounded-full border border-neutral-300 bg-white shadow hover:bg-red-50 dark:border-neutral-700 dark:hover:bg-red-800"
+                      onClick={(e) => handleRemove(e, product.id)}
+                      disabled={status === "executing"}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                   <div className="ml-2 flex flex-row space-x-4">
                     <div className="flex flex-1 flex-col text-base">
