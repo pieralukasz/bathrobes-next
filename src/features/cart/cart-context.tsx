@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, use, useContext, useMemo, useOptimistic } from "react";
+import {
+  createContext,
+  use,
+  useContext,
+  useMemo,
+  useOptimistic,
+  useTransition,
+} from "react";
 import { CartWithDetails, CartWithDetailsItem } from "~/server/db/queries/cart";
 import { ProductWithDetails } from "~/server/db/queries/product";
 import { InferProductSize } from "~/server/db/schema";
@@ -41,6 +48,7 @@ type CartContextType = {
     product: ProductWithDetails,
   ) => void;
   deleteCartItem: (basketItemId: number) => void;
+  isPending: boolean;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -108,9 +116,7 @@ function cartReducer(
         return {
           ...currentCart,
           items: currentCart.items.map((item) =>
-            item.productSizeId === productSizeId
-              ? { ...item, quantity: item.quantity }
-              : item,
+            item.productSizeId === productSizeId ? { ...item, quantity } : item,
           ),
         };
       }
@@ -163,22 +169,27 @@ export function CartProvider({
   cartPromise: Promise<CartWithDetails | undefined>;
 }) {
   const initialCart = use(cartPromise);
+  const [isPending, startTransition] = useTransition();
   const [optimisticCart, updateOptimisticCart] = useOptimistic(
     initialCart,
     cartReducer,
   );
 
   const updateCartItem = (basketItemId: number, updateType: UpdateType) => {
-    updateOptimisticCart({
-      type: "UPDATE_ITEM",
-      payload: { basketItemId, updateType },
+    startTransition(() => {
+      updateOptimisticCart({
+        type: "UPDATE_ITEM",
+        payload: { basketItemId, updateType },
+      });
     });
   };
 
   const deleteCartItem = (basketItemId: number) => {
-    updateOptimisticCart({
-      type: "DELETE_ITEM",
-      payload: { basketItemId },
+    startTransition(() => {
+      updateOptimisticCart({
+        type: "DELETE_ITEM",
+        payload: { basketItemId },
+      });
     });
   };
 
@@ -188,9 +199,11 @@ export function CartProvider({
     productSize: InferProductSize,
     product: ProductWithDetails,
   ) => {
-    updateOptimisticCart({
-      type: "ADD_ITEM",
-      payload: { productSizeId, quantity, productSize, product },
+    startTransition(() => {
+      updateOptimisticCart({
+        type: "ADD_ITEM",
+        payload: { productSizeId, quantity, productSize, product },
+      });
     });
   };
 
@@ -200,8 +213,9 @@ export function CartProvider({
       updateCartItem,
       deleteCartItem,
       addCartItem,
+      isPending,
     }),
-    [optimisticCart],
+    [optimisticCart, isPending],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

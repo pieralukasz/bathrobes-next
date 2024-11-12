@@ -13,8 +13,6 @@ import {
 } from "~/components/ui/sheet";
 import { useCart } from "./cart-context";
 import { useRouter } from "next/navigation";
-import { createUrl } from "~/lib/utils";
-import Link from "next/link";
 import { CartItems } from "./cart-items";
 
 export const CartModal = () => {

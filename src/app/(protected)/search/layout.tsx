@@ -11,7 +11,7 @@ export default function SearchLayout({
 }) {
   return (
     <>
-      <div className="b-4 mx-auto flex max-w-screen-2xl flex-col gap-8 px-4 py-4 text-black dark:text-white md:flex-row">
+      <div className="b-4 mx-auto flex w-full max-w-screen-2xl flex-col gap-8 px-4 py-4 text-black dark:text-white md:flex-row">
         <div className="order-first w-full flex-none md:max-w-[125px]">
           <Categories />
         </div>

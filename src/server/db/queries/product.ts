@@ -1,8 +1,8 @@
 import { db } from "..";
-import { eq } from "drizzle-orm";
+import { eq, like, or } from "drizzle-orm";
 import { InferProduct } from "../schema";
 
-type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
+export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
 export async function getCategory(slug: string) {
   return await db.query.categories.findFirst({
@@ -23,15 +23,27 @@ export async function getProducts({
   categoryId,
   sortKey = "createdAt",
   reverse = false,
+  searchValue = "",
 }: {
   categoryId?: number;
   sortKey?: SortKey;
   reverse?: boolean;
+  searchValue?: string;
 }) {
   return await db.query.products.findMany({
-    where: categoryId
-      ? (products) => eq(products.categoryId, categoryId)
-      : undefined,
+    where: (products) => {
+      if (categoryId) {
+        return eq(products.categoryId, categoryId);
+      }
+      if (searchValue) {
+        return or(
+          like(products.name, `%${searchValue}%`),
+          like(products.description || "", `%${searchValue}%`),
+          like(products.slug, `%${searchValue}%`),
+        );
+      }
+      return undefined;
+    },
     orderBy: (products, { desc, asc }) => [
       reverse ? desc(products[sortKey]) : asc(products[sortKey]),
     ],
