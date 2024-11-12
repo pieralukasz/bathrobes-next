@@ -94,7 +94,7 @@ function cartReducer(
           ...currentCart,
           items: currentCart.items.map((item) =>
             item.productSizeId === productSizeId
-              ? { ...item, quantity: item.quantity + quantity }
+              ? { ...item, quantity: item.quantity }
               : item,
           ),
         };

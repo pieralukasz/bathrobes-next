@@ -21,7 +21,7 @@ export async function addToCart(
     .values(values)
     .onConflictDoUpdate({
       target: [basketItems.basketId, basketItems.productSizeId],
-      set: { quantity: sql`${basketItems.quantity} + 1` },
+      set: { quantity: sql` EXCLUDED.quantity` },
     });
 }
 

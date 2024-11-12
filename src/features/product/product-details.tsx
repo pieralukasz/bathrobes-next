@@ -29,6 +29,7 @@ import {
 } from "~/components/ui/form";
 import { Button } from "~/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
+import { useCart } from "../cart/cart-context";
 
 interface ProductDetailsProps {
   product: ProductWithDetails;
@@ -37,6 +38,7 @@ interface ProductDetailsProps {
 export const ProductDetails = ({ product }: ProductDetailsProps) => {
   if (!product) return null;
 
+  const { cart, addCartItem } = useCart();
   const form = useForm<ProductDetailsFormData>({
     resolver: zodResolver(productDetailsFormSchema),
     defaultValues: {
@@ -49,17 +51,34 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
   const { execute } = useAction(addToCartAction);
 
   const selectedColor = form.watch("color");
+  const selectedSize = form.watch("size");
 
   const sizes = useMemo(() => {
     const color = product.colors.find((color) => color.color === selectedColor);
     return color?.sizes ?? [];
   }, [selectedColor, product.colors]);
 
+  const existingCartItem = useMemo(() => {
+    if (!cart || !selectedColor || !selectedSize) return null;
+
+    const color = product.colors.find((c) => c.color === selectedColor);
+    const size = color?.sizes.find((s) => s.size === selectedSize);
+
+    return cart.items.find((item) => item.productSizeId === size?.id);
+  }, [cart, selectedColor, selectedSize, product.colors]);
+
+  const getButtonText = () => {
+    if (existingCartItem) return "Update cart";
+    return "Add to cart";
+  };
+
   const onSubmit = async (data: ProductDetailsFormData) => {
     const selectedColor = product.colors.find((c) => c.color === data.color);
     const selectedSize = selectedColor?.sizes.find((s) => s.size === data.size);
 
     if (!selectedSize) return;
+
+    addCartItem(selectedSize.id, data.quantity, selectedSize, product);
 
     execute({
       productSizeId: selectedSize.id,
@@ -174,8 +193,12 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
                 />
 
                 <Button type="submit" className="mt-4" disabled={!sizes.length}>
-                  Add to cart
+                  {getButtonText()}
                 </Button>
+
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Currently in cart: {existingCartItem?.quantity || 0}
+                </p>
               </form>
             </Form>
           </CardContent>
