@@ -1,4 +1,5 @@
 import { ProductsList } from "~/features/product/products-list";
+import { defaultSort, sorting } from "~/lib/constants";
 import { getProducts } from "~/server/db/queries/product";
 
 export const metadata = {
@@ -11,13 +12,12 @@ export default async function SearchPage(props: {
 }) {
   const searchParams = await props.searchParams;
   const { sort, q: searchValue } = searchParams as { [key: string]: string };
-  //   const { sortKey, reverse } =
-  //     sorting.find((item) => item.slug === sort) || defaultSort;
+  const { sortKey, reverse } =
+    sorting.find((item) => item.slug === sort) || defaultSort;
 
   console.log(searchValue, sort);
 
   const products = await getProducts({});
-  const resultsText = products.length > 1 ? "results" : "result";
 
   return (
     <section>

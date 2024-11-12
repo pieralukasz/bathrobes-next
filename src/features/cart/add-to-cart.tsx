@@ -11,7 +11,7 @@ interface AddToCartProps {
 }
 
 export function AddToCart({ size, product, quantity }: AddToCartProps) {
-  const { cart, addCartItem } = useCart();
+  const { addCartItem } = useCart();
 
   const { execute, result } = useAction(addToCartAction);
 

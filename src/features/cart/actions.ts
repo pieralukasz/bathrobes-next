@@ -1,8 +1,6 @@
 "use server";
 
 import { actionClient } from "~/lib/safe-action";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "~/lib/constants";
 import { addToCartSchema, updateCartSchema, removeItemSchema } from "./schema";
@@ -12,18 +10,38 @@ import {
   removeFromCart,
   updateCart,
 } from "~/server/db/mutations/cart";
-import { getCart } from "~/server/db/queries/cart";
+import { getCart as getExistingCart } from "~/server/db/queries/cart";
 import type { InferBasket } from "~/server/db/schema";
-import { getUser } from "~/lib/supabase/server";
+import { getUser as getUserSupabase } from "~/lib/supabase/server";
+import { createOrder } from "~/server/db/mutations/orders";
+
+const getUser = async () => {
+  try {
+    const user = await getUserSupabase();
+    if (!user) throw new Error("Not authenticated");
+    return user;
+  } catch (e) {
+    throw new Error("Not authenticated");
+  }
+};
+
+const getCart = async (userId: string) => {
+  try {
+    const cart = await getExistingCart(userId);
+    if (!cart) throw new Error("Cart not found");
+    return cart;
+  } catch (e) {
+    throw new Error("Error getting cart");
+  }
+};
 
 export const addToCartAction = actionClient
   .schema(addToCartSchema)
   .action(async ({ parsedInput: { productSizeId, quantity } }) => {
     try {
       const user = await getUser();
-      if (!user) return { error: "Not authenticated" };
 
-      let cart: InferBasket | undefined = await getCart(user.id);
+      let cart: InferBasket | undefined = await getExistingCart(user.id);
 
       if (!cart) {
         const [newCart] = await createCart(user.id);
@@ -44,10 +62,8 @@ export const removeItemAction = actionClient
   .action(async ({ parsedInput: { basketItemId } }) => {
     try {
       const user = await getUser();
-      if (!user) return { error: "Not authenticated" };
 
-      const cart = await getCart(user.id);
-      if (!cart) return { error: "Cart not found" };
+      await getCart(user.id);
 
       await removeFromCart([basketItemId]);
       revalidateTag(CACHE_TAGS.cart);
@@ -63,10 +79,7 @@ export const updateItemQuantityAction = actionClient
   .action(async ({ parsedInput: { basketItemId, quantity } }) => {
     try {
       const user = await getUser();
-      if (!user) return { error: "Not authenticated" };
-
-      const cart = await getCart(user.id);
-      if (!cart) return { error: "Cart not found" };
+      await getCart(user.id);
 
       if (quantity === 0) {
         await removeFromCart([basketItemId]);
@@ -85,10 +98,7 @@ export const updateItemQuantityAction = actionClient
 export const clearCartAction = actionClient.action(async () => {
   try {
     const user = await getUser();
-    if (!user) return { error: "Not authenticated" };
-
     const cart = await getCart(user.id);
-    if (!cart) return { error: "Cart not found" };
 
     const basketItemIds = cart.items.map((item) => item.id);
     await removeFromCart(basketItemIds);
@@ -97,5 +107,18 @@ export const clearCartAction = actionClient.action(async () => {
   } catch (e) {
     console.error(e);
     return { error: "Error clearing cart" };
+  }
+});
+
+export const checkoutAction = actionClient.action(async () => {
+  try {
+    const user = await getUser();
+    await getCart(user.id);
+    await createOrder(user.id);
+    revalidateTag(CACHE_TAGS.cart);
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { error: "Error checking out" };
   }
 });
