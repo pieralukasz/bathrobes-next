@@ -68,13 +68,15 @@ function cartReducer(
   state: CartWithDetails | undefined,
   action: CartAction,
 ): CartWithDetails {
-  const currentCart = state || createEmptyCart("");
+  if (!state) {
+    return createEmptyCart("");
+  }
 
   switch (action.type) {
     case "UPDATE_ITEM": {
       const { basketItemId, updateType } = action.payload;
 
-      const updatedItems = currentCart.items
+      const updatedItems = state.items
         .map((item) => {
           if (item.id !== basketItemId) return item;
 
@@ -83,59 +85,64 @@ function cartReducer(
           const newQuantity =
             updateType === "plus" ? item.quantity + 1 : item.quantity - 1;
 
-          if (newQuantity === 0) return null;
+          // Prevent negative quantities
+          if (newQuantity <= 0) return null;
 
           return {
             ...item,
             quantity: newQuantity,
+            updatedAt: new Date(),
           };
         })
         .filter(Boolean) as CartWithDetailsItem[];
 
       return {
-        ...currentCart,
+        ...state,
         items: updatedItems,
-      };
-    }
-
-    case "DELETE_ITEM": {
-      const { basketItemId } = action.payload;
-      return {
-        ...currentCart,
-        items: currentCart.items.filter((item) => item.id !== basketItemId),
+        updatedAt: new Date(),
       };
     }
 
     case "ADD_ITEM": {
       const { productSizeId, quantity, productSize, product } = action.payload;
-      const existingItem = currentCart.items.find(
+
+      if (quantity <= 0) {
+        throw new Error("Quantity must be positive");
+      }
+
+      if (!product) {
+        throw new Error("Product is required");
+      }
+
+      const color = product.colors.find(
+        (color) => color.id === productSize.colorId,
+      );
+
+      if (!color) {
+        throw new Error(`Color not found for ID: ${productSize.colorId}`);
+      }
+
+      const existingItem = state.items.find(
         (item) => item.productSizeId === productSizeId,
       );
 
       if (existingItem) {
         return {
-          ...currentCart,
-          items: currentCart.items.map((item) =>
-            item.productSizeId === productSizeId ? { ...item, quantity } : item,
+          ...state,
+          items: state.items.map((item) =>
+            item.productSizeId === productSizeId
+              ? { ...item, quantity, updatedAt: new Date() }
+              : item,
           ),
+          updatedAt: new Date(),
         };
       }
 
-      if (!product) {
-        throw new Error("Product not found");
-      }
-
-      const color = product?.colors.find(
-        (color) => color.id === productSize.colorId,
-      );
-
-      if (!color) {
-        throw new Error("Color not found");
-      }
+      const tempId = Date.now() + Math.random();
 
       const newItem: CartWithDetailsItem = {
-        id: Math.random(),
-        basketId: currentCart.id,
+        id: tempId,
+        basketId: state.id,
         productSizeId,
         quantity,
         createdAt: new Date(),
@@ -151,13 +158,22 @@ function cartReducer(
       };
 
       return {
-        ...currentCart,
-        items: [...currentCart.items, newItem],
+        ...state,
+        items: [...state.items, newItem],
+        updatedAt: new Date(),
+      };
+    }
+
+    case "DELETE_ITEM": {
+      const { basketItemId } = action.payload;
+      return {
+        ...state,
+        items: state.items.filter((item) => item.id !== basketItemId),
       };
     }
 
     default:
-      return currentCart;
+      return state;
   }
 }
 

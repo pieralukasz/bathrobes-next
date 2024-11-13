@@ -24,9 +24,11 @@ export function encodedRedirect(
 export const createUrl = (
   pathname: string,
   params: URLSearchParams | ReadonlyURLSearchParams,
+  baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "",
 ) => {
   const paramsString = params.toString();
   const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
+  const url = `${baseUrl}${pathname}${queryString}`;
 
-  return `${pathname}${queryString}`;
+  return url;
 };

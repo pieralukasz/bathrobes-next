@@ -26,16 +26,21 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
     e.stopPropagation();
 
     deleteCartItem(basketItemId);
-    await execute({ basketItemId });
+    execute({ basketItemId });
   };
 
   return (
     <div className="flex h-[calc(100%-128px)] flex-col justify-between overflow-hidden">
       <ul className="mb-2 flex-grow overflow-auto p-4">
         {cart.items.map((product, i) => {
+          const params = new URLSearchParams({
+            color: product.productSize.color.color,
+            size: product.productSize.size,
+          });
+
           const productUrl = createUrl(
             `/product/${product.productSize.color.product.slug}`,
-            new URLSearchParams(),
+            params,
           );
 
           return (

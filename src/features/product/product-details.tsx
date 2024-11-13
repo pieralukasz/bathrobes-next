@@ -33,20 +33,30 @@ import { useCart } from "../cart/cart-context";
 
 interface ProductDetailsProps {
   product: ProductWithDetails;
+  defaultColor?: string;
+  defaultSize?: string;
 }
 
-export const ProductDetails = ({ product }: ProductDetailsProps) => {
+export const ProductDetails = ({
+  product,
+  defaultColor,
+  defaultSize,
+}: ProductDetailsProps) => {
   if (!product) return null;
 
   const { cart, addCartItem } = useCart();
   const form = useForm<ProductDetailsFormData>({
     resolver: zodResolver(productDetailsFormSchema),
     defaultValues: {
-      color: product.colors[0]?.color || "",
-      size: product.colors[0]?.sizes[0]?.size || "",
+      color: defaultColor || product.colors[0]?.color || "",
+      size: defaultSize || product.colors[0]?.sizes[0]?.size || "",
       quantity: (() => {
-        const initialColor = product.colors[0];
-        const initialSize = initialColor?.sizes[0];
+        const initialColor = product.colors.find(
+          (c) => c.color === (defaultColor || product.colors[0]?.color),
+        );
+        const initialSize = initialColor?.sizes.find(
+          (s) => s.size === (defaultSize || initialColor?.sizes[0]?.size),
+        );
         if (!cart || !initialColor || !initialSize) return 1;
 
         const existingItem = cart.items.find(
