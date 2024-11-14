@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import { useCart } from "./cart-context";
-import { createUrl } from "~/lib/utils";
+import { cn, createUrl } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
 import { removeItemAction } from "./actions";
@@ -46,7 +46,10 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
           return (
             <li
               key={i}
-              className="flex w-full flex-col border-b border-neutral-300 dark:border-neutral-700"
+              className={cn(
+                "flex w-full flex-col border-b border-neutral-300 dark:border-neutral-700",
+                i === cart.items.length - 1 ? "border-b-0" : "",
+              )}
             >
               <div className="relative flex w-full justify-between px-1 py-4">
                 <Link

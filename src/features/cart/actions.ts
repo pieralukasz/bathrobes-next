@@ -115,7 +115,9 @@ export const checkoutAction = actionClient.action(async () => {
     const user = await getUser();
     await getCart(user.id);
     await createOrder(user.id);
+
     revalidateTag(CACHE_TAGS.cart);
+
     return { success: true };
   } catch (e) {
     console.error(e);

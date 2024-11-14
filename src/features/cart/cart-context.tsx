@@ -12,7 +12,7 @@ import { CartWithDetails, CartWithDetailsItem } from "~/server/db/queries/cart";
 import { ProductWithDetails } from "~/server/db/queries/product";
 import { InferProductSize } from "~/server/db/schema";
 
-type UpdateType = "plus" | "minus" | "delete";
+type UpdateType = "plus" | "minus" | "delete" | "clear";
 
 type CartAction =
   | {
@@ -36,6 +36,9 @@ type CartAction =
       payload: {
         basketItemId: number;
       };
+    }
+  | {
+      type: "CLEAR_CART";
     };
 
 type CartContextType = {
@@ -48,6 +51,7 @@ type CartContextType = {
     product: ProductWithDetails,
   ) => void;
   deleteCartItem: (basketItemId: number) => void;
+  clearCart: () => void;
   isPending: boolean;
 };
 
@@ -172,6 +176,14 @@ function cartReducer(
       };
     }
 
+    case "CLEAR_CART": {
+      return {
+        ...state,
+        items: [],
+        updatedAt: new Date(),
+      };
+    }
+
     default:
       return state;
   }
@@ -185,6 +197,8 @@ export function CartProvider({
   cartPromise: Promise<CartWithDetails | undefined>;
 }) {
   const initialCart = use(cartPromise);
+
+  console.log(initialCart);
   const [isPending, startTransition] = useTransition();
   const [optimisticCart, updateOptimisticCart] = useOptimistic(
     initialCart,
@@ -223,12 +237,21 @@ export function CartProvider({
     });
   };
 
+  const clearCart = () => {
+    startTransition(() => {
+      updateOptimisticCart({
+        type: "CLEAR_CART",
+      });
+    });
+  };
+
   const value = useMemo(
     () => ({
       cart: optimisticCart,
       updateCartItem,
       deleteCartItem,
       addCartItem,
+      clearCart,
       isPending,
     }),
     [optimisticCart, isPending],

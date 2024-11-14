@@ -9,10 +9,7 @@ export const Search = () => {
   const searchParams = useSearchParams();
 
   return (
-    <Form
-      action="/search"
-      className="w-max-[550px] relative w-full md:w-1/3 lg:w-80 xl:w-full"
-    >
+    <Form action="/search" className="relative w-full md:w-1/3 lg:w-80">
       <Input
         key={searchParams?.get("q")}
         type="text"

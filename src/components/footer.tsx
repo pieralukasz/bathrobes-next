@@ -8,7 +8,7 @@ export const Footer = async () => {
 
   return (
     <footer className="mx-auto mt-auto flex w-full items-center justify-center gap-2 border-t py-4 text-center text-xs">
-      <p>
+      <p className="hidden sm:block">
         Powered by <span className="font-bold">Lucas Piera</span>
       </p>
       <Link href="/orders">My Orders</Link>

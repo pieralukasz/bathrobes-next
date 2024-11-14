@@ -9,9 +9,9 @@ export const Navbar = async () => {
   const user = await getUser();
 
   return (
-    <nav className="z-10 flex h-16 w-full justify-center border-b border-b-foreground/10 bg-white">
-      <div className="flex w-full items-center justify-between py-3 text-sm md:max-w-4xl">
-        <div className="flex items-center gap-5 font-semibold">
+    <nav className="z-10 flex h-16 w-full justify-center border-b border-b-foreground/10">
+      <div className="flex w-full items-center justify-between gap-6 px-3 py-3 text-sm md:max-w-4xl">
+        <div className="hidden font-semibold md:block">
           <Link href={"/"}>L&L Bathrobes</Link>
         </div>
         {user && (
