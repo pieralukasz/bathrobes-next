@@ -27,7 +27,10 @@ export const CreateOrder = () => {
 
     try {
       setError(null);
+      console.log("ELO");
       const result = await executeAsync();
+
+      console.log(result);
 
       if (result?.data?.error) {
         const errorMessages: Record<string, string> = {

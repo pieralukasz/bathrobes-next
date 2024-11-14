@@ -6,7 +6,16 @@ import { ArrowDown } from "lucide-react";
 export default async function HomePage() {
   return (
     <div className="mb-10 flex flex-grow flex-col items-center justify-center space-y-6 px-2 text-center">
-      <Image src={`/logo.jpg`} alt="logo" width="128" height="128" />
+      <div className="rounded-md bg-white p-2">
+        <Image
+          src={`/logo.jpg`}
+          alt="logo"
+          width="128"
+          height="128"
+          className="rounded-md"
+        />
+      </div>
+
       <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">
         Welcome to L&L Bathrobes
       </h1>

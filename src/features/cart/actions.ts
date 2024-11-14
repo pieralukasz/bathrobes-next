@@ -43,6 +43,8 @@ export const addToCartAction = actionClient
 
       let cart: InferBasket | undefined = await getExistingCart(user.id);
 
+      console.log(cart);
+
       if (!cart) {
         const [newCart] = await createCart(user.id);
         cart = newCart as InferBasket;
@@ -50,6 +52,7 @@ export const addToCartAction = actionClient
 
       await addToCart(cart.id, [{ productSizeId, quantity }]);
       revalidateTag(CACHE_TAGS.cart);
+      revalidateTag(CACHE_TAGS.orders);
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -67,6 +70,7 @@ export const removeItemAction = actionClient
 
       await removeFromCart([basketItemId]);
       revalidateTag(CACHE_TAGS.cart);
+      revalidateTag(CACHE_TAGS.orders);
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -88,6 +92,8 @@ export const updateItemQuantityAction = actionClient
       }
 
       revalidateTag(CACHE_TAGS.cart);
+      revalidateTag(CACHE_TAGS.orders);
+
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -102,7 +108,9 @@ export const clearCartAction = actionClient.action(async () => {
 
     const basketItemIds = cart.items.map((item) => item.id);
     await removeFromCart(basketItemIds);
+
     revalidateTag(CACHE_TAGS.cart);
+    revalidateTag(CACHE_TAGS.orders);
     return { success: true };
   } catch (e) {
     console.error(e);
@@ -112,15 +120,30 @@ export const clearCartAction = actionClient.action(async () => {
 
 export const checkoutAction = actionClient.action(async () => {
   try {
+    console.log("Starting checkout process...");
     const user = await getUser();
-    await getCart(user.id);
-    await createOrder(user.id);
+    const cart = await getCart(user.id);
 
-    revalidateTag(CACHE_TAGS.cart);
+    if (!cart || cart.items.length === 0) {
+      console.error("Empty cart detected");
+      return { error: "Cannot create order with empty basket" };
+    }
 
-    return { success: true };
-  } catch (e) {
-    console.error(e);
-    return { error: "Error checking out" };
+    console.log("Creating order for user:", user.id);
+    const order = await createOrder(user.id);
+
+    if (!order) {
+      console.error("Order creation failed");
+      return { error: "Failed to create order" };
+    }
+
+    console.log("Order created successfully:", order.id);
+    revalidateTag(CACHE_TAGS.cart), revalidateTag(CACHE_TAGS.orders);
+
+    return { success: true, orderId: order.id };
+  } catch (e: any) {
+    console.error("Checkout error:", e);
+    const errorMessage = e.message || "Error checking out";
+    return { error: errorMessage };
   }
 });

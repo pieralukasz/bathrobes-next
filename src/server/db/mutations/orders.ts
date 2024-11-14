@@ -1,80 +1,89 @@
 import { db } from "..";
-import { orders, orderItems, baskets, basketItems } from "../schema";
+import {
+  orders,
+  orderItems,
+  baskets,
+  basketItems,
+  productSizes,
+} from "../schema";
 import { eq } from "drizzle-orm";
 
 export async function createOrder(userId: string) {
-  try {
-    const result = await db.transaction(async (tx) => {
-      // Get user's basket first
+  console.log("Starting order creation for user:", userId);
+
+  return await db.transaction(async (tx) => {
+    try {
+      console.log("Getting basket...");
       const [basket] = await tx
         .select()
         .from(baskets)
         .where(eq(baskets.userId, userId));
 
       if (!basket) {
+        console.error("No basket found for user:", userId);
         throw new Error("NO_BASKET");
       }
 
-      // Get basket items before creating order
-      const userBasketItems = await tx
-        .select()
+      console.log("Getting basket items...");
+      const basketItemsWithProducts = await tx
+        .select({
+          basketItem: basketItems,
+          productSize: productSizes,
+        })
         .from(basketItems)
+        .innerJoin(productSizes, eq(basketItems.productSizeId, productSizes.id))
         .where(eq(basketItems.basketId, basket.id));
 
-      if (userBasketItems.length === 0) {
+      console.log("Found basket items:", basketItemsWithProducts.length);
+
+      if (basketItemsWithProducts.length === 0) {
+        console.error("Empty basket for user:", userId);
         throw new Error("EMPTY_BASKET");
       }
 
-      // Create new order
+      console.log("Creating order...");
       const [newOrder] = await tx.insert(orders).values({ userId }).returning();
 
       if (!newOrder?.id) {
+        console.error("Failed to create order");
         throw new Error("ORDER_CREATION_FAILED");
       }
 
-      // Create order items
+      console.log("Creating order items...");
+      const orderItemValues = basketItemsWithProducts.map(({ basketItem }) => ({
+        orderId: newOrder.id,
+        productSizeId: basketItem.productSizeId,
+        quantity: basketItem.quantity,
+      }));
+
       const orderItemsResult = await tx
         .insert(orderItems)
-        .values(
-          userBasketItems.map((item) => ({
-            orderId: newOrder.id,
-            productSizeId: item.productSizeId,
-            quantity: item.quantity,
-          })),
-        )
+        .values(orderItemValues)
         .returning();
 
       if (!orderItemsResult.length) {
+        console.error("Failed to create order items");
         throw new Error("ORDER_ITEMS_CREATION_FAILED");
       }
 
+      console.log("Clearing basket...");
       const deleteResult = await tx
         .delete(basketItems)
         .where(eq(basketItems.basketId, basket.id))
         .returning();
 
+      console.log("Deleted basket items:", deleteResult.length);
+
       if (!deleteResult.length) {
-        throw new Error("BASKET_ITEMS_DELETE_FAILED");
+        console.error("Failed to clear basket");
+        throw new Error("BASKET_CLEAR_FAILED");
       }
 
-      return {
-        order: newOrder,
-        orderItems: orderItemsResult,
-        deletedItems: deleteResult,
-      };
-    });
-
-    if (
-      !result.order ||
-      !result.orderItems.length ||
-      !result.deletedItems.length
-    ) {
-      throw new Error("TRANSACTION_INCOMPLETE");
+      console.log("Order created successfully:", newOrder.id);
+      return newOrder;
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      throw error;
     }
-
-    return result.order;
-  } catch (error) {
-    console.error("Create order error:", error);
-    throw error;
-  }
+  });
 }

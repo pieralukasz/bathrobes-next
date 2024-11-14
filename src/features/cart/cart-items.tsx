@@ -67,7 +67,7 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute -left-2 -top-2 h-6 w-6 rounded-full border border-neutral-300 bg-white shadow hover:bg-red-50 dark:border-neutral-700 dark:hover:bg-red-800"
+                      className="absolute -left-2 -top-2 h-6 w-6 rounded-full border border-neutral-300 bg-white shadow hover:bg-red-50 dark:border-neutral-700 dark:bg-red-500 dark:hover:bg-red-800"
                       onClick={(e) => handleRemove(e, product.id)}
                       disabled={status === "executing"}
                     >
