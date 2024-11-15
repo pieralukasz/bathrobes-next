@@ -59,7 +59,7 @@ export const productQueries = {
     });
   },
 
-  getProduct: async (id: number): Promise<InferProduct | undefined> => {
+  getProduct: async (id: number) => {
     return await db.query.products.findFirst({
       where: (products) => eq(products.id, id),
       with: {

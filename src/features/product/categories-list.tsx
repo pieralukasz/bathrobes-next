@@ -2,10 +2,10 @@ import { Suspense } from "react";
 import { FilterList } from "~/components/search";
 import { cn } from "~/lib/utils";
 
-import { getCategories } from "~/server/db/queries/products";
+import { productQueries } from "~/server/db/queries";
 
 async function CategoriesList() {
-  const categories = await getCategories();
+  const categories = await productQueries.getCategories();
 
   const all = {
     title: "All",

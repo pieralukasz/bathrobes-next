@@ -3,9 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "~/components/ui/card";
-import { products } from "~/server/db/schema";
-
-export type ProductWithDetails = typeof products.$inferSelect;
+import { ProductWithDetails } from "./product-details";
 
 interface ProductCardProps {
   product: ProductWithDetails;
@@ -13,6 +11,10 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
+
+  if (!product) {
+    return null;
+  }
 
   const handleClick = () => {
     router.push(`/product/${product.slug}`);

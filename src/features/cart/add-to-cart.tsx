@@ -2,7 +2,7 @@ import { InferProductSize } from "~/server/db/schema";
 import { useCart } from "./cart-context";
 import { addToCartAction } from "./actions";
 import { useAction } from "next-safe-action/hooks";
-import { ProductWithDetails } from "~/server/db/queries/products";
+import { ProductWithDetails } from "../product/product-details";
 
 interface AddToCartProps {
   product: ProductWithDetails;

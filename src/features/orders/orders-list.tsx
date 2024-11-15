@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { getOrderByIdAndUserId } from "~/server/db/queries/orders";
+import { orderQueries } from "~/server/db/queries";
 
 interface OrdersListProps {
-  orders: NonNullable<Awaited<ReturnType<typeof getOrderByIdAndUserId>>>[];
+  orders: NonNullable<
+    Awaited<ReturnType<typeof orderQueries.getOrderByIdAndUserId>>
+  >[];
 }
 
 export function OrdersList({ orders }: OrdersListProps) {

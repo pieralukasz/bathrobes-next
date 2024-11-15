@@ -1,18 +1,10 @@
-import { HeaderAuth } from "~/features/auth/header-auth";
-import { ThemeSwitcher } from "~/components/theme-switcher";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
-import Link from "next/link";
-import { Suspense } from "react";
 
 import "../styles/globals.css";
-import { Basket } from "~/features/cart/basket";
-import { cookies } from "next/headers";
-import { getCart } from "~/server/db/queries/carts";
+import { basketQueries } from "~/server/db/queries";
 import { CartProvider } from "~/features/cart/cart-context";
-import { createClient, getUser } from "~/lib/supabase/server";
-import { SignOutButton } from "~/features/auth/sign-out-button";
-import { CartModal } from "~/features/cart/cart-modal";
+import { getUser } from "~/lib/supabase/server";
 import { Footer } from "~/components/footer";
 import { Navbar } from "~/components/navbar/navbar";
 
@@ -33,7 +25,9 @@ export default async function RootLayout({
 }) {
   const user = await getUser();
 
-  const cartPromise = user ? getCart(user.id) : Promise.resolve(undefined);
+  const cartPromise = user
+    ? basketQueries.getByUserId(user.id)
+    : Promise.resolve(undefined);
 
   return (
     <html lang="en" className={GeistSans.className} suppressHydrationWarning>

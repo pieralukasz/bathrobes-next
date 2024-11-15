@@ -8,12 +8,9 @@ import {
   useOptimistic,
   useTransition,
 } from "react";
-import {
-  CartWithDetails,
-  CartWithDetailsItem,
-} from "~/server/db/queries/carts";
-import { ProductWithDetails } from "~/server/db/queries/products";
+import { ProductWithDetails } from "../product/product-details";
 import { InferProductSize } from "~/server/db/schema";
+import { BasketWithDetails, BasketWithDetailsItem } from "~/server/db/queries";
 
 type UpdateType = "plus" | "minus" | "delete" | "clear";
 
@@ -45,7 +42,7 @@ type CartAction =
     };
 
 type CartContextType = {
-  cart: CartWithDetails | undefined;
+  cart: BasketWithDetails | undefined;
   updateCartItem: (basketItemId: number, updateType: UpdateType) => void;
   addCartItem: (
     productSizeId: number,
@@ -60,21 +57,21 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-function createEmptyCart(userId: string): CartWithDetails {
+function createEmptyCart(userId: string): BasketWithDetails {
   return {
     id: 0,
     userId,
     items: [],
     createdAt: new Date(),
-    updatedAt: null,
+    updatedAt: new Date(),
     deletedAt: null,
   };
 }
 
 function cartReducer(
-  state: CartWithDetails | undefined,
+  state: BasketWithDetails | undefined,
   action: CartAction,
-): CartWithDetails {
+): BasketWithDetails {
   if (!state) {
     return createEmptyCart("");
   }
@@ -101,7 +98,7 @@ function cartReducer(
             updatedAt: new Date(),
           };
         })
-        .filter(Boolean) as CartWithDetailsItem[];
+        .filter(Boolean) as BasketWithDetailsItem[];
 
       return {
         ...state,
@@ -147,13 +144,13 @@ function cartReducer(
 
       const tempId = Date.now() + Math.random();
 
-      const newItem: CartWithDetailsItem = {
+      const newItem: BasketWithDetailsItem = {
         id: tempId,
         basketId: state.id,
         productSizeId,
         quantity,
         createdAt: new Date(),
-        updatedAt: null,
+        updatedAt: new Date(),
         deletedAt: null,
         productSize: {
           ...productSize,
@@ -197,7 +194,7 @@ export function CartProvider({
   cartPromise,
 }: {
   children: React.ReactNode;
-  cartPromise: Promise<CartWithDetails | undefined>;
+  cartPromise: Promise<BasketWithDetails | undefined>;
 }) {
   const initialCart = use(cartPromise);
 

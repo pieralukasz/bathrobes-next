@@ -11,7 +11,6 @@ import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Input } from "~/components/ui/input";
 import { useMemo } from "react";
-import { ProductWithDetails } from "~/server/db/queries/products";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { addToCartAction } from "../cart/actions";
@@ -30,9 +29,14 @@ import {
 import { Button } from "~/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
 import { useCart } from "../cart/cart-context";
+import { productQueries } from "~/server/db/queries";
+
+export type ProductWithDetails = Awaited<
+  NonNullable<ReturnType<typeof productQueries.getProduct>>
+>;
 
 interface ProductDetailsProps {
-  product: ProductWithDetails;
+  product: Awaited<NonNullable<ReturnType<typeof productQueries.getProduct>>>;
   defaultColor?: string;
   defaultSize?: string;
 }

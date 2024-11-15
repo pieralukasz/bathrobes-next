@@ -1,3 +1,8 @@
+"use cache";
+unstable_cacheLife("minutes");
+unstable_cacheTag("products");
+
+import { unstable_cacheLife, unstable_cacheTag } from "next/cache";
 import { ProductsList } from "~/features/product/products-list";
 import { defaultSort, sorting } from "~/lib/constants";
 import { productQueries } from "~/server/db/queries";
