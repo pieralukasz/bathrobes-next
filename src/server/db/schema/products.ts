@@ -1,4 +1,11 @@
-import { pgTable, integer, varchar, boolean, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  integer,
+  varchar,
+  boolean,
+  index,
+  unique,
+} from "drizzle-orm/pg-core";
 import { timestampColumns } from "./timestamp";
 import { categories } from "./categories";
 
@@ -7,7 +14,7 @@ export const products = pgTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     name: varchar("name", { length: 256 }).notNull(),
-    slug: varchar("slug", { length: 256 }).notNull().unique(),
+    slug: varchar("slug", { length: 256 }).notNull(),
     description: varchar("description", { length: 512 }),
     categoryId: integer("category_id")
       .references(() => categories.id)
@@ -19,6 +26,7 @@ export const products = pgTable(
   (table) => ({
     categoryIdx: index("products_category_id_idx").on(table.categoryId),
     slugIdx: index("products_slug_idx").on(table.slug),
+    slugUnq: unique("products_slug_unique").on(table.slug),
   }),
 );
 
@@ -35,6 +43,8 @@ export const productColors = pgTable(
   },
   (table) => ({
     productIdx: index("product_colors_product_id_idx").on(table.productId),
+    colorIdx: index("product_colors_color_idx").on(table.color),
+    colorUnq: unique("product_colors_color_unique").on(table.color),
   }),
 );
 
@@ -53,6 +63,7 @@ export const productSizes = pgTable(
   (table) => ({
     colorIdx: index("product_sizes_color_id_idx").on(table.colorId),
     eanIdx: index("product_sizes_ean_idx").on(table.ean),
+    unq: unique().on(table.colorId, table.size, table.ean),
   }),
 );
 

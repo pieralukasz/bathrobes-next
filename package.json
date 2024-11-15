@@ -10,8 +10,9 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "bun run ./src/server/db/seed.ts",
-    "db:update": "bun run ./src/server/db/update-inventory.ts",
+    "db:update": "bun run ./src/server/db/update-db.ts",
     "dev": "next dev",
+    "test": "vitest",
     "build": "next build",
     "start": "next start"
   },
@@ -53,6 +54,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@types/eslint": "^8.56.10",
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
@@ -60,10 +62,14 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^8.1.0",
     "@typescript-eslint/parser": "^8.1.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "jsdom": "^25.0.1",
     "postcss": "8.4.33",
     "tailwind-merge": "^2.5.2",
     "tailwindcss": "3.4.1",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "vite-tsconfig-paths": "^5.1.2",
+    "vitest": "^2.1.5"
   }
 }

@@ -1,6 +1,6 @@
 {
-  "id": "ef50ad1e-079a-40e9-9ae7-1b2842b380e3",
-  "prevId": "6161af61-f5ed-4499-a03c-c29aa3606ec5",
+  "id": "11e7db6b-06a2-4bb8-a876-81d5d43f242e",
+  "prevId": "bc51818c-2bde-4856-83d9-40e44fca4258",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -356,6 +356,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "product_colors_color_idx": {
+          "name": "product_colors_color_idx",
+          "columns": [
+            {
+              "expression": "color",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -374,7 +389,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "product_colors_color_unique": {
+          "name": "product_colors_color_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "color"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -498,6 +521,15 @@
           "name": "product_sizes_ean_unique",
           "nullsNotDistinct": false,
           "columns": [
+            "ean"
+          ]
+        },
+        "product_sizes_color_id_size_ean_unique": {
+          "name": "product_sizes_color_id_size_ean_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "color_id",
+            "size",
             "ean"
           ]
         }

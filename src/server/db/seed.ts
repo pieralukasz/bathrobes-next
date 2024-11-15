@@ -3,72 +3,70 @@ import { db } from ".";
 import { getXMLProducts } from "./utils";
 import { categories } from "./schema/categories";
 import { productColors, productSizes, products } from "./schema/products";
+import { inArray, not } from "drizzle-orm";
 
 async function seed() {
-  console.log("Starting the seed process...");
-
-  await db.delete(productSizes);
-  console.log("Deleted productSizes...");
-  await db.delete(productColors);
-  console.log("Deleted productColors...");
-  await db.delete(products);
-  console.log("Deleted products...");
-  await db.delete(categories);
-  console.log("Deleted categories...");
-
   const productsFromXML = await getXMLProducts();
   console.log(`Parsed ${productsFromXML.length} products from XML.`);
 
-  // It will work only once during seed process
-  const categoryMap = new Map();
-  const productMap = new Map();
-  const colorMap = new Map();
+  const productSizesProcessed = new Set<string>();
 
   for (const item of productsFromXML) {
-    const { ean, name, categoryName, color, size, quantity } = item;
-    console.log(`Processing product: ${name}`);
+    const { ean, name, categoryName, color, size } = item;
 
-    let categoryId;
-    if (!categoryMap.has(categoryName)) {
-      const [category] = await db
-        .insert(categories)
-        .values({ name: categoryName, slug: slugCreator(categoryName) })
-        .onConflictDoNothing()
-        .returning({ id: categories.id });
-      categoryId = category?.id;
-      categoryMap.set(categoryName, categoryId);
+    const [category] = await db
+      .insert(categories)
+      .values({ name: categoryName, slug: slugCreator(categoryName) })
+      .onConflictDoUpdate({
+        target: [categories.slug],
+        set: { name: categoryName, updatedAt: new Date() },
+      })
+      .returning({ id: categories.id });
+
+    const categoryId = category?.id;
+
+    if (!categoryId) {
+      throw new Error(`Category not found: ${categoryName}`);
+    } else {
       console.log(`Inserted/Found category ID: ${categoryId}`);
-    } else {
-      categoryId = categoryMap.get(categoryName);
     }
 
-    let productId;
-    if (!productMap.has(name)) {
-      const [product] = await db
-        .insert(products)
-        .values({ name, categoryId, slug: slugCreator(name) })
-        .onConflictDoNothing()
-        .returning({ id: products.id });
-      productId = product?.id;
-      productMap.set(name, productId);
+    const [product] = await db
+      .insert(products)
+      .values({
+        name,
+        categoryId,
+        slug: slugCreator(name),
+      })
+      .onConflictDoUpdate({
+        target: [products.slug],
+        set: { categoryId, updatedAt: new Date() },
+      })
+      .returning({ id: products.id });
+
+    const productId = product?.id;
+
+    if (!productId) {
+      throw new Error(`Product not found: ${name}`);
+    } else {
       console.log(`Inserted/Found product ID: ${productId}`);
-    } else {
-      productId = productMap.get(name);
     }
 
-    const colorKey = `${productId}-${color}`;
-    let colorId;
-    if (!colorMap.has(colorKey)) {
-      const [productColor] = await db
-        .insert(productColors)
-        .values({ productId, color })
-        .onConflictDoNothing()
-        .returning({ id: productColors.id });
-      colorId = productColor?.id;
-      colorMap.set(colorKey, colorId);
-      console.log(`Inserted/Found color ID: ${colorId}`);
+    const [productColor] = await db
+      .insert(productColors)
+      .values({ productId, color })
+      .onConflictDoUpdate({
+        target: [productColors.color],
+        set: { productId, updatedAt: new Date() },
+      })
+      .returning({ id: productColors.id });
+
+    const colorId = productColor?.id;
+
+    if (!colorId) {
+      throw new Error(`Color not found: ${color}`);
     } else {
-      colorId = colorMap.get(colorKey);
+      console.log(`Inserted/Found color ID: ${colorId}`);
     }
 
     await db
@@ -77,23 +75,41 @@ async function seed() {
         colorId,
         size,
         ean,
-        quantity,
+        quantity: 1,
       })
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: [productSizes.ean],
+        set: { colorId, size, quantity: 1, updatedAt: new Date() },
+      });
 
-    console.log(
-      `Inserted size for color ID ${colorId}, EAN ${ean}, quantity ${quantity}`,
-    );
+    productSizesProcessed.add(ean);
+
+    console.log(`Inserted size for color ID ${colorId}, EAN ${ean}`);
   }
+
+  await db
+    .update(productSizes)
+    .set({
+      quantity: 0,
+      updatedAt: new Date(),
+    })
+    .where(not(inArray(productSizes.ean, Array.from(productSizesProcessed))));
 
   console.log(`Database seeded with ${productsFromXML.length} products 🌱`);
 }
 
-seed()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(() => {
-    process.exit(1);
-  });
+// Export for testing
+export default seed;
+
+// Execute if running as main script
+if (require.main === module) {
+  seed()
+    .catch((e) => {
+      console.error("Error seeding database:", e);
+      process.exit(1);
+    })
+    .then(() => {
+      console.log("Database seeding completed successfully!");
+      process.exit(0);
+    });
+}
