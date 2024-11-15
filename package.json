@@ -10,6 +10,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "bun run ./src/server/db/seed.ts",
+    "db:update": "bun run ./src/server/db/update-inventory.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"

@@ -35,3 +35,7 @@ export const basketItems = pgTable(
     unq: unique().on(table.basketId, table.productSizeId),
   }),
 );
+
+export type InferBasket = typeof baskets.$inferSelect;
+
+export type InferBasketItem = typeof basketItems.$inferSelect;

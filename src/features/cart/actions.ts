@@ -1,4 +1,6 @@
-"use server";
+("use server");
+
+import { InferBasket } from "~/server/db/schema";
 
 import { actionClient } from "~/lib/safe-action";
 import { revalidateTag } from "next/cache";
@@ -7,7 +9,6 @@ import { addToCartSchema, updateCartSchema, removeItemSchema } from "./schema";
 import { basketMutations, orderMutations } from "~/server/db/mutations";
 import { basketQueries } from "~/server/db/queries";
 import { getUser as getUserSupabase } from "~/lib/supabase/server";
-import { InferBasket } from "~/server/db/schema/basket";
 
 const getUser = async () => {
   try {
