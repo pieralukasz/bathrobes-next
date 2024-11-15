@@ -3,7 +3,7 @@ import { CartItems } from "~/features/cart/cart-items";
 
 import { CreateOrder } from "~/features/cart/create-order";
 import { getUser } from "~/lib/supabase/server";
-import { getCart } from "~/server/db/queries/cart";
+import { basketQueries } from "~/server/db/queries";
 
 export default async function CheckoutPage() {
   const user = await getUser();
@@ -12,7 +12,7 @@ export default async function CheckoutPage() {
     redirect("/login");
   }
 
-  const cart = await getCart(user.id);
+  const cart = await basketQueries.getByUserId(user.id);
 
   if (!cart) {
     redirect("/search");

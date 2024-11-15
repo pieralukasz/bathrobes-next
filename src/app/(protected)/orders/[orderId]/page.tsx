@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getOrderByIdAndUserId } from "~/server/db/queries/orders";
+import { orderQueries } from "~/server/db/queries";
 import { OrderItems } from "~/features/orders/order-items";
 import { getUser } from "~/lib/supabase/server";
 
@@ -11,7 +11,10 @@ export default async function OrderPage({
   const user = await getUser();
   if (!user?.id) return null;
 
-  const order = await getOrderByIdAndUserId(parseInt(params.orderId), user.id);
+  const order = await orderQueries.getOrderByIdAndUserId(
+    parseInt(params.orderId),
+    user.id,
+  );
 
   if (!order || order.userId !== user?.id) {
     return notFound();

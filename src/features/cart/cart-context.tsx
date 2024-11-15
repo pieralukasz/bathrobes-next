@@ -8,8 +8,11 @@ import {
   useOptimistic,
   useTransition,
 } from "react";
-import { CartWithDetails, CartWithDetailsItem } from "~/server/db/queries/cart";
-import { ProductWithDetails } from "~/server/db/queries/product";
+import {
+  CartWithDetails,
+  CartWithDetailsItem,
+} from "~/server/db/queries/carts";
+import { ProductWithDetails } from "~/server/db/queries/products";
 import { InferProductSize } from "~/server/db/schema";
 
 type UpdateType = "plus" | "minus" | "delete" | "clear";

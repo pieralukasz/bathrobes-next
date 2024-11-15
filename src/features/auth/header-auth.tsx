@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "../../components/ui/button";
-import { createClient } from "~/lib/supabase/server";
 
 export const HeaderAuth = async () => {
   return (

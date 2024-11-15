@@ -1,4 +1,4 @@
-import { SortKey } from "~/server/db/queries/product";
+import { SortKey } from "~/server/db/queries/products";
 
 export type SortFilterItem = {
   title: string;

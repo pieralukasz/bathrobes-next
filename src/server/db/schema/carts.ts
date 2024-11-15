@@ -1,34 +1,37 @@
-import { pgTable as table } from "drizzle-orm/pg-core";
-import * as t from "drizzle-orm/pg-core";
-import { timestamps } from "./timestamp";
-import { InferProductSize, productSizes } from "./products";
+import { pgTable, integer, varchar, index, unique } from "drizzle-orm/pg-core";
+import { timestampColumns } from "./timestamp";
+import { productSizes } from "./products";
 
-export const baskets = table("baskets", {
-  id: t.integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  userId: t.varchar("user_id", { length: 256 }).notNull(),
-  ...timestamps,
-});
-
-export const basketItems = table(
-  "basket_items",
+export const baskets = pgTable(
+  "baskets",
   {
-    id: t.integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    basketId: t
-      .integer("basket_id")
-      .references(() => baskets.id, { onDelete: "cascade" })
-      .notNull(),
-    productSizeId: t
-      .integer("product_size_id")
-      .references(() => productSizes.id)
-      .notNull(),
-    quantity: t.integer("quantity").notNull(),
-    ...timestamps,
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    userId: varchar("user_id", { length: 256 }).notNull(),
+    ...timestampColumns,
   },
   (table) => ({
-    unq: t.unique().on(table.basketId, table.productSizeId),
+    userIdx: index("baskets_user_id_idx").on(table.userId),
   }),
 );
 
-export type InferBasket = typeof baskets.$inferSelect;
-
-export type InferBasketItem = typeof basketItems.$inferSelect;
+export const basketItems = pgTable(
+  "basket_items",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    basketId: integer("basket_id")
+      .references(() => baskets.id, { onDelete: "cascade" })
+      .notNull(),
+    productSizeId: integer("product_size_id")
+      .references(() => productSizes.id)
+      .notNull(),
+    quantity: integer("quantity").notNull(),
+    ...timestampColumns,
+  },
+  (table) => ({
+    basketIdx: index("basket_items_basket_id_idx").on(table.basketId),
+    productSizeIdx: index("basket_items_product_size_id_idx").on(
+      table.productSizeId,
+    ),
+    unq: unique().on(table.basketId, table.productSizeId),
+  }),
+);

@@ -4,16 +4,10 @@ import { actionClient } from "~/lib/safe-action";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "~/lib/constants";
 import { addToCartSchema, updateCartSchema, removeItemSchema } from "./schema";
-import {
-  addToCart,
-  createCart,
-  removeFromCart,
-  updateCart,
-} from "~/server/db/mutations/cart";
-import { getCart as getExistingCart } from "~/server/db/queries/cart";
-import type { InferBasket } from "~/server/db/schema";
+import { basketMutations, orderMutations } from "~/server/db/mutations";
+import { basketQueries } from "~/server/db/queries";
 import { getUser as getUserSupabase } from "~/lib/supabase/server";
-import { createOrder } from "~/server/db/mutations/orders";
+import { InferBasket } from "~/server/db/schema/basket";
 
 const getUser = async () => {
   try {
@@ -27,7 +21,7 @@ const getUser = async () => {
 
 const getCart = async (userId: string) => {
   try {
-    const cart = await getExistingCart(userId);
+    const cart = await basketQueries.getByUserId(userId);
     if (!cart) throw new Error("Cart not found");
     return cart;
   } catch (e) {
@@ -41,16 +35,16 @@ export const addToCartAction = actionClient
     try {
       const user = await getUser();
 
-      let cart: InferBasket | undefined = await getExistingCart(user.id);
-
-      console.log(cart);
+      let cart: InferBasket | undefined = await basketQueries.getByUserId(
+        user.id,
+      );
 
       if (!cart) {
-        const [newCart] = await createCart(user.id);
+        const [newCart] = await basketMutations.create(user.id);
         cart = newCart as InferBasket;
       }
 
-      await addToCart(cart.id, [{ productSizeId, quantity }]);
+      await basketMutations.addItems(cart.id, [{ productSizeId, quantity }]);
       revalidateTag(CACHE_TAGS.cart);
       revalidateTag(CACHE_TAGS.orders);
       return { success: true };
@@ -68,7 +62,7 @@ export const removeItemAction = actionClient
 
       await getCart(user.id);
 
-      await removeFromCart([basketItemId]);
+      await basketMutations.removeItems([basketItemId]);
       revalidateTag(CACHE_TAGS.cart);
       revalidateTag(CACHE_TAGS.orders);
       return { success: true };
@@ -86,9 +80,9 @@ export const updateItemQuantityAction = actionClient
       await getCart(user.id);
 
       if (quantity === 0) {
-        await removeFromCart([basketItemId]);
+        await basketMutations.removeItems([basketItemId]);
       } else {
-        await updateCart([{ id: basketItemId, quantity }]);
+        await basketMutations.updateItems([{ id: basketItemId, quantity }]);
       }
 
       revalidateTag(CACHE_TAGS.cart);
@@ -107,7 +101,7 @@ export const clearCartAction = actionClient.action(async () => {
     const cart = await getCart(user.id);
 
     const basketItemIds = cart.items.map((item) => item.id);
-    await removeFromCart(basketItemIds);
+    await basketMutations.removeItems(basketItemIds);
 
     revalidateTag(CACHE_TAGS.cart);
     revalidateTag(CACHE_TAGS.orders);
@@ -130,7 +124,7 @@ export const checkoutAction = actionClient.action(async () => {
     }
 
     console.log("Creating order for user:", user.id);
-    const order = await createOrder(user.id);
+    const order = await orderMutations.create(user.id);
 
     if (!order) {
       console.error("Order creation failed");
@@ -138,7 +132,8 @@ export const checkoutAction = actionClient.action(async () => {
     }
 
     console.log("Order created successfully:", order.id);
-    revalidateTag(CACHE_TAGS.cart), revalidateTag(CACHE_TAGS.orders);
+    revalidateTag(CACHE_TAGS.cart);
+    revalidateTag(CACHE_TAGS.orders);
 
     return { success: true, orderId: order.id };
   } catch (e: any) {

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { ProductsList } from "~/features/product/products-list";
 import { defaultSort, sorting } from "~/lib/constants";
 
-import { getCategory, getProducts } from "~/server/db/queries/product";
+import { productQueries } from "~/server/db/queries/products";
 
 // export async function generateMetadata(props: {
 //   params: Promise<{ category: string }>;
@@ -30,11 +30,11 @@ export default async function CategoryPage(props: {
   const { sortKey, reverse } =
     sorting.find((item) => item.slug === sort) || defaultSort;
 
-  const category = await getCategory(params.category);
+  const category = await productQueries.getCategory(params.category);
 
   if (!category) return notFound();
 
-  const products = await getProducts({
+  const products = await productQueries.getProducts({
     categoryId: category.id,
     sortKey,
     reverse,

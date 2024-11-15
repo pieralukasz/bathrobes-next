@@ -1,17 +1,19 @@
-import { timestamp } from "drizzle-orm/pg-core";
+import { timestamp, PgTimestampConfig } from "drizzle-orm/pg-core";
 
-const createdAt = timestamp("created_at", { withTimezone: true })
-  .$onUpdate(() => new Date())
-  .notNull();
+export const commonTimestampConfig: PgTimestampConfig = { withTimezone: true };
 
-const updatedAt = timestamp("updated_at", { withTimezone: true }).$onUpdate(
-  () => new Date(),
-);
+const createdAt = timestamp("created_at", commonTimestampConfig)
+  .notNull()
+  .defaultNow();
 
-const deletedAt = timestamp("deleted_at", { withTimezone: true });
+const updatedAt = timestamp("updated_at", commonTimestampConfig)
+  .notNull()
+  .defaultNow();
 
-export const timestamps = {
-  updatedAt,
+const deletedAt = timestamp("deleted_at", commonTimestampConfig);
+
+export const timestampColumns = {
   createdAt,
+  updatedAt,
   deletedAt,
-};
+} as const;

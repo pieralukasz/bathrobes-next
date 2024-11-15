@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { FilterList } from "~/components/search";
 import { cn } from "~/lib/utils";
 
-import { getCategories } from "~/server/db/queries/product";
+import { getCategories } from "~/server/db/queries/products";
 
 async function CategoriesList() {
   const categories = await getCategories();

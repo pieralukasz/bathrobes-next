@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import "../styles/globals.css";
 import { Basket } from "~/features/cart/basket";
 import { cookies } from "next/headers";
-import { getCart } from "~/server/db/queries/cart";
+import { getCart } from "~/server/db/queries/carts";
 import { CartProvider } from "~/features/cart/cart-context";
 import { createClient, getUser } from "~/lib/supabase/server";
 import { SignOutButton } from "~/features/auth/sign-out-button";

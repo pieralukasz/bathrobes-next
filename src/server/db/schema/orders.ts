@@ -1,27 +1,39 @@
-import { pgTable as table } from "drizzle-orm/pg-core";
-import * as t from "drizzle-orm/pg-core";
-import { timestamps } from "./timestamp";
+import { pgTable, integer, varchar, index } from "drizzle-orm/pg-core";
+import { timestampColumns } from "./timestamp";
 import { productSizes } from "./products";
 
-export const orders = table("orders", {
-  id: t.integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  userId: t.varchar("user_id", { length: 256 }).notNull(),
-  ...timestamps,
-});
+export const orders = pgTable(
+  "orders",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    userId: varchar("user_id", { length: 256 }).notNull(),
+    ...timestampColumns,
+  },
+  (table) => ({
+    userIdx: index("orders_user_id_idx").on(table.userId),
+  }),
+);
 
-export const orderItems = table("order_items", {
-  id: t.integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  orderId: t
-    .integer("order_id")
-    .references(() => orders.id, { onDelete: "cascade" })
-    .notNull(),
-  productSizeId: t
-    .integer("product_size_id")
-    .references(() => productSizes.id)
-    .notNull(),
-  quantity: t.integer("quantity").notNull(),
-  ...timestamps,
-});
+export const orderItems = pgTable(
+  "order_items",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    orderId: integer("order_id")
+      .references(() => orders.id, { onDelete: "cascade" })
+      .notNull(),
+    productSizeId: integer("product_size_id")
+      .references(() => productSizes.id)
+      .notNull(),
+    quantity: integer("quantity").notNull(),
+    ...timestampColumns,
+  },
+  (table) => ({
+    orderIdx: index("order_items_order_id_idx").on(table.orderId),
+    productSizeIdx: index("order_items_product_size_id_idx").on(
+      table.productSizeId,
+    ),
+  }),
+);
 
 export type InferOrder = typeof orders.$inferSelect;
 export type InferOrderItem = typeof orderItems.$inferSelect;
