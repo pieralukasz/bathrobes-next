@@ -1,6 +1,5 @@
 import { db } from "..";
 import { eq, like, or } from "drizzle-orm";
-import { InferProduct } from "../schema";
 
 export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
@@ -8,6 +7,9 @@ export const productQueries = {
   getCategory: async (slug: string) => {
     return await db.query.categories.findFirst({
       where: (categories) => eq(categories.slug, slug),
+      with: {
+        products: true,
+      },
     });
   },
 
