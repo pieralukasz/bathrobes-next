@@ -87,13 +87,13 @@ async function seed() {
     console.log(`Inserted size for color ID ${colorId}, EAN ${ean}`);
   }
 
-  // await db
-  //   .update(productSizes)
-  //   .set({
-  //     quantity: 0,
-  //     updatedAt: new Date(),
-  //   })
-  //   .where(not(inArray(productSizes.ean, Array.from(productSizesProcessed))));
+  await db
+    .update(productSizes)
+    .set({
+      quantity: 0,
+      updatedAt: new Date(),
+    })
+    .where(not(inArray(productSizes.ean, Array.from(productSizesProcessed))));
 
   console.log(`Database seeded with ${productsFromXML.length} products 🌱`);
 }

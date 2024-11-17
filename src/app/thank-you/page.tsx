@@ -18,7 +18,7 @@ export default function ThankYouPage() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-4 delay-300 duration-700 animate-in fade-in">
+      <div className="flex flex-col gap-4">
         <Button asChild size="lg">
           <Link href="/search">Continue Shopping</Link>
         </Button>

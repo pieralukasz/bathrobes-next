@@ -198,7 +198,6 @@ export function CartProvider({
 }) {
   const initialCart = use(cartPromise);
 
-  console.log(initialCart);
   const [isPending, startTransition] = useTransition();
   const [optimisticCart, updateOptimisticCart] = useOptimistic(
     initialCart,
