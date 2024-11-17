@@ -19,8 +19,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "prepare": "husky",
-    "db:clean": "node --loader ts-node/esm /scripts/clean-db.ts"
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
