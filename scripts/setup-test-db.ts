@@ -9,11 +9,11 @@ async function setupTestDb() {
 
   try {
     console.log("📥 Stopping existing containers...");
-    await execAsync("npm run db:down");
+    await execAsync("npm run test-db:down");
     await execAsync("docker volume rm ll-bathrobe_postgres_data || true");
 
     console.log("🚀 Starting new PostgreSQL container...");
-    await execAsync("npm run db:up");
+    await execAsync("npm run test-db:up");
 
     console.log("⏳ Waiting for PostgreSQL to be ready...");
     const sql = postgres({
@@ -43,8 +43,8 @@ async function setupTestDb() {
     console.log("📊 Pushing database schema...");
     await execAsync("npm run db:push");
 
-    console.log("🌱 Seeding database...");
-    await execAsync("npm run db:seed");
+    // console.log("🌱 Seeding database...");
+    // await execAsync("npm run db:seed");
 
     console.log("✅ Database setup completed successfully!");
   } catch (error) {
@@ -53,4 +53,4 @@ async function setupTestDb() {
   }
 }
 
-setupDb();
+setupTestDb();

@@ -5,16 +5,11 @@ import { getXMLProducts, ParsedProduct } from "./utils";
 import { products, productColors, productSizes, categories } from "./schema";
 import { afterEach } from "node:test";
 
+import { deleteAllDataFromDatabase } from "~/test/utils";
+
 vi.mock("./utils", () => ({
   getXMLProducts: vi.fn(),
 }));
-
-const clearDatabase = async () => {
-  await db.delete(productSizes);
-  await db.delete(productColors);
-  await db.delete(products);
-  await db.delete(categories);
-};
 
 const mockProducts: ParsedProduct[] = [
   {
@@ -39,11 +34,11 @@ describe("Database seeding", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.mocked(getXMLProducts).mockResolvedValue(mockProducts);
-    await clearDatabase();
+    await deleteAllDataFromDatabase();
   });
 
   afterEach(async () => {
-    await clearDatabase();
+    await deleteAllDataFromDatabase();
   });
 
   it("should create categories, products, colors and sizes", async () => {

@@ -5,7 +5,7 @@ import { parseRawXmlToData, ParsedProduct, RawProduct } from "./utils";
 // Mock environment variables
 vi.mock("~/env", () => ({
   env: {
-    XML_URL: "http://example.com/test.xml",
+    XML_URL: "https://magazyn.szlafroki.com/csv/ArkuszZamowien.xml",
   },
 }));
 
