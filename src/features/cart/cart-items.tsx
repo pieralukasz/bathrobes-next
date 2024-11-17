@@ -34,8 +34,7 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
       <ul className="mb-2 flex-grow overflow-auto p-4">
         {cart.items.map((product, i) => {
           const params = new URLSearchParams({
-            color: product.productSize.color.color,
-            size: product.productSize.size,
+            ean: product.productSize.ean,
           });
 
           const productUrl = createUrl(

@@ -11,8 +11,7 @@ export const OrderItems = ({ items }: OrderItemsProps) => {
       <ul className="mb-2 flex-grow overflow-auto p-4">
         {items.map((item, i) => {
           const params = new URLSearchParams({
-            color: item.productSize.color.color,
-            size: item.productSize.size,
+            ean: item.productSize.ean,
           });
 
           const productUrl = createUrl(

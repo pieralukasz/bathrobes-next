@@ -36,32 +36,44 @@ export type ProductWithDetails = Awaited<
 >;
 
 interface ProductDetailsProps {
-  product: Awaited<NonNullable<ReturnType<typeof productQueries.getProduct>>>;
-  defaultColor?: string;
-  defaultSize?: string;
+  product: ProductWithDetails;
+  ean?: string;
 }
 
-export const ProductDetails = ({
-  product,
-  defaultColor,
-  defaultSize,
-}: ProductDetailsProps) => {
+const getProductDefaultsByEan = (product: ProductWithDetails, ean?: string) => {
+  if (!ean)
+    return {
+      defaultColor: null,
+      defaultSize: null,
+    };
+
+  const color = product?.colors.find((color) =>
+    color.sizes.some((size) => size.ean === ean),
+  );
+
+  const size = color?.sizes.find((size) => size.ean === ean);
+
+  return {
+    defaultColor: color,
+    defaultSize: size,
+  };
+};
+
+export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
   if (!product) return null;
+
+  const { defaultColor, defaultSize } = getProductDefaultsByEan(product, ean);
 
   const { cart, addCartItem } = useCart();
   const form = useForm<ProductDetailsFormData>({
     resolver: zodResolver(productDetailsFormSchema),
     defaultValues: {
-      color: defaultColor || product.colors[0]?.color || "",
-      size: defaultSize || product.colors[0]?.sizes[0]?.size || "",
+      color: defaultColor?.color || product.colors[0]?.color || "",
+      size: defaultSize?.size || product.colors[0]?.sizes[0]?.size || "",
       quantity: (() => {
-        const initialColor = product.colors.find(
-          (c) => c.color === (defaultColor || product.colors[0]?.color),
-        );
-        const initialSize = initialColor?.sizes.find(
-          (s) => s.size === (defaultSize || initialColor?.sizes[0]?.size),
-        );
-        if (!cart || !initialColor || !initialSize) return 1;
+        const initialSize = defaultSize || product.colors[0]?.sizes[0];
+
+        if (!cart || !initialSize) return 1;
 
         const existingItem = cart.items.find(
           (item) => item.productSizeId === initialSize.id,

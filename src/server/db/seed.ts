@@ -56,8 +56,8 @@ async function seed() {
       .insert(productColors)
       .values({ productId, color })
       .onConflictDoUpdate({
-        target: [productColors.color],
-        set: { productId, updatedAt: new Date() },
+        target: [productColors.productId, productColors.color], // Matches the unique constraint
+        set: { updatedAt: new Date() },
       })
       .returning({ id: productColors.id });
 
@@ -87,13 +87,13 @@ async function seed() {
     console.log(`Inserted size for color ID ${colorId}, EAN ${ean}`);
   }
 
-  await db
-    .update(productSizes)
-    .set({
-      quantity: 0,
-      updatedAt: new Date(),
-    })
-    .where(not(inArray(productSizes.ean, Array.from(productSizesProcessed))));
+  // await db
+  //   .update(productSizes)
+  //   .set({
+  //     quantity: 0,
+  //     updatedAt: new Date(),
+  //   })
+  //   .where(not(inArray(productSizes.ean, Array.from(productSizesProcessed))));
 
   console.log(`Database seeded with ${productsFromXML.length} products 🌱`);
 }

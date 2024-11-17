@@ -44,7 +44,7 @@ export const productColors = pgTable(
   (table) => ({
     productIdx: index("product_colors_product_id_idx").on(table.productId),
     colorIdx: index("product_colors_color_idx").on(table.color),
-    colorUnq: unique("product_colors_color_unique").on(table.color),
+    unq: unique().on(table.productId, table.color),
   }),
 );
 

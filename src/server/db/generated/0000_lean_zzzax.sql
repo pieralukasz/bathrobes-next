@@ -129,6 +129,7 @@ CREATE INDEX IF NOT EXISTS "basket_items_basket_id_idx" ON "basket_items" USING 
 CREATE INDEX IF NOT EXISTS "basket_items_product_size_id_idx" ON "basket_items" USING btree ("product_size_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "baskets_user_id_idx" ON "baskets" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "product_colors_product_id_idx" ON "product_colors" USING btree ("product_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "product_colors_color_idx" ON "product_colors" USING btree ("color");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "product_sizes_color_id_idx" ON "product_sizes" USING btree ("color_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "product_sizes_ean_idx" ON "product_sizes" USING btree ("ean");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "products_category_id_idx" ON "products" USING btree ("category_id");--> statement-breakpoint

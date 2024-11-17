@@ -1,5 +1,5 @@
 {
-  "id": "bc51818c-2bde-4856-83d9-40e44fca4258",
+  "id": "d0c0eff1-38ba-4905-8f7b-fbbed7c49105",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -347,6 +347,21 @@
           "columns": [
             {
               "expression": "product_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "product_colors_color_idx": {
+          "name": "product_colors_color_idx",
+          "columns": [
+            {
+              "expression": "color",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

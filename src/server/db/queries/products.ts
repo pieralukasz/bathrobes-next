@@ -75,6 +75,19 @@ export const productQueries = {
     });
   },
 
+  getColors: async (productId?: number) => {
+    if (!productId) {
+      return [];
+    }
+
+    return await db.query.productColors.findMany({
+      where: (productColors) => eq(productColors.productId, productId),
+      with: {
+        sizes: true,
+      },
+    });
+  },
+
   getProductBySlug: async (slug: string) => {
     return await db.query.products.findFirst({
       where: (products) => eq(products.slug, slug),
