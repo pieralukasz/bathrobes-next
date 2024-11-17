@@ -84,6 +84,7 @@ export const orderMutations = {
           "Order items to create:",
           JSON.stringify(orderItemValues, null, 2),
         );
+
         const orderItemsResult = await tx
           .insert(orderItems)
           .values(orderItemValues)
