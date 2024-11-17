@@ -1,4 +1,4 @@
-("use server");
+"use server";
 
 import { InferBasket } from "~/server/db/schema";
 
@@ -9,6 +9,7 @@ import { addToCartSchema, updateCartSchema, removeItemSchema } from "./schema";
 import { basketMutations, orderMutations } from "~/server/db/mutations";
 import { basketQueries } from "~/server/db/queries";
 import { getUser as getUserSupabase } from "~/lib/supabase/server";
+import { sendOrder } from "../orders/actions";
 
 const getUser = async () => {
   try {
@@ -133,6 +134,9 @@ export const checkoutAction = actionClient.action(async () => {
     }
 
     console.log("Order created successfully:", order.id);
+
+    await sendOrder();
+
     revalidateTag(CACHE_TAGS.cart);
     revalidateTag(CACHE_TAGS.orders);
 

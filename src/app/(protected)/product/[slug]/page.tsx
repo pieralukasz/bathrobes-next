@@ -12,9 +12,16 @@ export default async function ProductPage({
   const slug = (await params).slug;
   const product = await productQueries.getProductBySlug(slug);
 
-  const { color, size } = searchParams;
+  const searchedParams = await searchParams;
 
   if (!product) {
+    notFound();
+  }
+
+  const color = searchedParams?.color || product.colors[0]?.color;
+  const size = searchedParams?.size || product.colors[0]?.sizes[0]?.size;
+
+  if (!color || !size) {
     notFound();
   }
 

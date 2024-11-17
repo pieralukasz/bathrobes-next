@@ -8,6 +8,12 @@
 
 import { describe, expect, it } from "vitest";
 
+describe("Database seeding", () => {
+  it("should pass", () => {
+    expect(true).toBe(true);
+  });
+});
+
 // // Mock environment variables
 // vi.mock("~/env", () => ({
 //   env: {
@@ -40,11 +46,6 @@ import { describe, expect, it } from "vitest";
 // vi.mock("./utils", () => ({
 //   getXMLProducts: vi.fn(),
 // }));
-describe("Database seeding", () => {
-  it("should pass", () => {
-    expect(true).toBe(true);
-  });
-});
 
 // describe("Database seeding", () => {
 //   beforeEach(() => {
