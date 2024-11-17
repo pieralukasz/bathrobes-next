@@ -7,6 +7,23 @@ import { afterEach } from "node:test";
 
 import { deleteAllDataFromDatabase } from "~/test/utils";
 
+async function getTableCounts() {
+  const [categoryCount, productCount, colorCount, sizeCount] =
+    await Promise.all([
+      db.select().from(categories),
+      db.select().from(products),
+      db.select().from(productColors),
+      db.select().from(productSizes),
+    ]);
+
+  return {
+    categories: categoryCount.length,
+    products: productCount.length,
+    colors: colorCount.length,
+    sizes: sizeCount.length,
+  };
+}
+
 vi.mock("./utils", () => ({
   getXMLProducts: vi.fn(),
 }));
@@ -30,7 +47,7 @@ const mockProducts: ParsedProduct[] = [
   },
 ];
 
-describe("Database seeding", () => {
+describe("Database seeding with mock data", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.mocked(getXMLProducts).mockResolvedValue(mockProducts);
@@ -44,24 +61,20 @@ describe("Database seeding", () => {
   it("should create categories, products, colors and sizes", async () => {
     await seed();
 
-    // Verify category
     const categoryResult = await db.select().from(categories);
     expect(categoryResult).toHaveLength(1);
     expect(categoryResult[0]?.name).toBe("Luxury Bathrobes");
     expect(categoryResult[0]?.slug).toBe("luxury-bathrobes");
 
-    // Verify product
     const productResult = await db.select().from(products);
     expect(productResult).toHaveLength(1);
     expect(productResult[0]?.name).toBe("Test Bathrobe");
     expect(productResult[0]?.slug).toBe("test-bathrobe");
 
-    // Verify colors
     const colorResult = await db.select().from(productColors);
     expect(colorResult).toHaveLength(1);
     expect(colorResult[0]?.color).toBe("Blue");
 
-    // Verify sizes
     const sizeResult = await db.select().from(productSizes);
     expect(sizeResult).toHaveLength(2);
     expect(sizeResult.map((s) => s.size).sort()).toEqual(["L", "M"]);
@@ -69,47 +82,25 @@ describe("Database seeding", () => {
   });
 
   it("should update existing products instead of creating duplicates", async () => {
-    // First seed
     await seed();
 
-    // Verify initial state
     const initialCounts = await getTableCounts();
 
-    // Second seed
     await seed();
 
-    // Verify counts haven't changed
     const finalCounts = await getTableCounts();
     expect(finalCounts).toEqual(initialCounts);
   });
 
-  // Helper function to get table counts
-  async function getTableCounts() {
-    const [categoryCount, productCount, colorCount] = await Promise.all([
-      db.select().from(categories),
-      db.select().from(products),
-      db.select().from(productColors),
-    ]);
-
-    return {
-      categories: categoryCount.length,
-      products: productCount.length,
-      colors: colorCount.length,
-    };
-  }
-
   it("should set quantity to 0 for products not in XML", async () => {
-    // First seed with mock data
     await seed();
 
     if (!mockProducts[0] || !mockProducts[1]) {
       throw new Error("Mock data not found");
     }
 
-    // Change mock data to simulate removed product
     vi.mocked(getXMLProducts).mockResolvedValue([mockProducts[0]]);
 
-    // Seed again
     await seed();
 
     const sizes = await db.select().from(productSizes);
