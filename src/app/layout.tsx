@@ -7,6 +7,7 @@ import { CartProvider } from "~/features/cart/cart-context";
 import { getUser } from "~/lib/supabase/server";
 import { Footer } from "~/components/footer";
 import { Navbar } from "~/components/navbar/navbar";
+import { Toaster } from "~/components/ui/sonner";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -44,6 +45,7 @@ export default async function RootLayout({
               <main className="flex flex-grow">{children}</main>
               <Footer />
             </div>
+            <Toaster />
           </CartProvider>
         </ThemeProvider>
       </body>

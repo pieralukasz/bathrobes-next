@@ -6,6 +6,7 @@ import { checkoutAction } from "./actions";
 import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { AlertCircle, Loader2, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "~/lib/utils";
 
 export const CreateOrder = () => {
@@ -30,6 +31,16 @@ export const CreateOrder = () => {
       }
 
       if (result?.data?.success) {
+        if (!result?.data.emailSent) {
+          toast.error("An error occurred while sending the email", {
+            duration: 5000,
+          });
+        } else {
+          toast.success("Email sent successfully", {
+            duration: 5000,
+          });
+        }
+
         router.push("/thank-you");
         router.refresh();
       }

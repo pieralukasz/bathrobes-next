@@ -30,6 +30,7 @@ import { Button } from "~/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
 import { useCart } from "../cart/cart-context";
 import { productQueries } from "~/server/db/queries";
+import { IncrementorInput } from "~/components/ui/incrementor-input";
 
 export type ProductWithDetails = Awaited<
   NonNullable<ReturnType<typeof productQueries.getProduct>>
@@ -205,27 +206,29 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          className="w-24"
-                          min={1}
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="w-full">
+                  <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity</FormLabel>
+                        <div className="max-w-[138px]">
+                          <FormControl className="w-20">
+                            <IncrementorInput
+                              min={1}
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <Button type="submit" className="mt-4" disabled={!sizes.length}>
                   {getButtonText()}
