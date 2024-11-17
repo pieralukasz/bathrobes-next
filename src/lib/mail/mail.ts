@@ -3,39 +3,34 @@ import { env } from "~/env";
 
 export async function sendMail({
   to,
-  name,
   subject,
   body,
 }: {
   to: string;
-  name: string;
   subject: string;
   body: string;
 }) {
   const transport = nodemailer.createTransport({
-    service: "mail.gmx.com",
+    host: "mail.gmx.com",
+    port: 465,
+    secure: true,
     auth: {
       user: env.NEXT_PUBLIC_SMTP_EMAIL,
       pass: env.NEXT_PUBLIC_SMTP_PASSWORD,
     },
+    tls: {
+      rejectUnauthorized: true,
+    },
   });
-  try {
-    const testResult = await transport.verify();
-    console.log(testResult);
-  } catch (error) {
-    console.error({ error });
-    return;
-  }
 
-  try {
-    const sendResult = await transport.sendMail({
-      from: env.NEXT_PUBLIC_SMTP_EMAIL,
-      to,
-      subject,
-      html: body,
-    });
-    console.log(sendResult);
-  } catch (error) {
-    console.log(error);
-  }
+  await transport.verify();
+
+  const sendResult = await transport.sendMail({
+    from: env.NEXT_PUBLIC_SMTP_EMAIL,
+    to,
+    subject,
+    html: body,
+  });
+
+  return sendResult;
 }

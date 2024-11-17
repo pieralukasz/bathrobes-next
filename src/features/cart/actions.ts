@@ -116,34 +116,37 @@ export const clearCartAction = actionClient.action(async () => {
 
 export const checkoutAction = actionClient.action(async () => {
   try {
-    console.log("Starting checkout process...");
     const user = await getUser();
     const cart = await getCart(user.id);
 
     if (!cart || cart.items.length === 0) {
-      console.error("Empty cart detected");
       return { error: "Cannot create order with empty basket" };
     }
 
-    console.log("Creating order for user:", user.id);
     const order = await orderMutations.create(user.id);
 
     if (!order) {
-      console.error("Order creation failed");
       return { error: "Failed to create order" };
     }
 
-    console.log("Order created successfully:", order.id);
-
-    await sendOrder();
+    let emailSent = true;
+    try {
+      await sendOrder(order.id);
+    } catch (mailError) {
+      console.error("Failed to send order email:", mailError);
+      emailSent = false;
+    }
 
     revalidateTag(CACHE_TAGS.cart);
     revalidateTag(CACHE_TAGS.orders);
 
-    return { success: true, orderId: order.id };
+    return {
+      success: true,
+      orderId: order.id,
+      emailSent,
+    };
   } catch (e: any) {
     console.error("Checkout error:", e);
-    const errorMessage = e.message || "Error checking out";
-    return { error: errorMessage };
+    return { error: e.message || "Error checking out" };
   }
 });
