@@ -1,14 +1,20 @@
+version: "3.8"
 services:
-  test-db:
-    image: postgres:16.3
-    environment:
-      POSTGRES_USER: docker
-      POSTGRES_PASSWORD: docker
-      POSTGRES_DB: postgres
+  postgres:
+    image: postgres:15
     ports:
-      - "5432:5432"
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: drizzle
+      POSTGRES_PASSWORD: drizzle
+      POSTGRES_DB: tests
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U docker"]
+      test: ["CMD-SHELL", "pg_isready -U drizzle -d tests"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  postgres_data:

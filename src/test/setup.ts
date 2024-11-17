@@ -1,11 +1,12 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { sql } from "drizzle-orm";
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
+import { afterAll, afterEach, beforeEach, vi } from "vitest";
 
 import * as schema from "../server/db/schema";
 import { db } from "../server/db";
 import { applyMigrations } from "../server/db/migrate";
+import { env } from "~/env";
 
 vi.mock("~/env", () => ({
   env: {
@@ -14,10 +15,9 @@ vi.mock("~/env", () => ({
 }));
 
 vi.mock("../server/db", async (importOriginal) => {
-  const client = postgres(
-    "postgresql://docker:docker@localhost:5432/postgres",
-    { max: 1 },
-  );
+  const client = postgres("postgres://drizzle:drizzle@localhost:5433/tests", {
+    max: 1,
+  });
 
   const db = drizzle(client, { schema });
 
@@ -26,17 +26,6 @@ vi.mock("../server/db", async (importOriginal) => {
     db,
     client,
   };
-});
-
-// Clear all tables after each test
-afterEach(async () => {
-  await db.execute(sql`
-    TRUNCATE TABLE products, product_colors, product_sizes, categories CASCADE;
-  `);
-});
-
-beforeAll(async () => {
-  await applyMigrations();
 });
 
 afterAll(async () => {

@@ -1,297 +1,125 @@
-// import { beforeEach, describe, expect, it, vi } from "vitest";
-// import { faker } from "@faker-js/faker";
-// import { db } from ".";
-// import { getXMLProducts } from "./utils";
-// import { categories } from "./schema/categories";
-// import { productColors, productSizes, products } from "./schema/products";
-// import seed from "./seed";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { db } from ".";
+import seed from "./seed";
+import { getXMLProducts, ParsedProduct } from "./utils";
+import { products, productColors, productSizes, categories } from "./schema";
+import { afterEach } from "node:test";
 
-import { describe, expect, it } from "vitest";
+vi.mock("./utils", () => ({
+  getXMLProducts: vi.fn(),
+}));
+
+const clearDatabase = async () => {
+  await db.delete(productSizes);
+  await db.delete(productColors);
+  await db.delete(products);
+  await db.delete(categories);
+};
+
+const mockProducts: ParsedProduct[] = [
+  {
+    ean: "1234567890123",
+    name: "Test Bathrobe",
+    categoryName: "Luxury Bathrobes",
+    color: "Blue",
+    size: "L",
+    quantity: 1,
+  },
+  {
+    ean: "1234567890124",
+    name: "Test Bathrobe",
+    categoryName: "Luxury Bathrobes",
+    color: "Blue",
+    size: "M",
+    quantity: 1,
+  },
+];
 
 describe("Database seeding", () => {
-  it("should pass", () => {
-    expect(true).toBe(true);
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.mocked(getXMLProducts).mockResolvedValue(mockProducts);
+    await clearDatabase();
+  });
+
+  afterEach(async () => {
+    await clearDatabase();
+  });
+
+  it("should create categories, products, colors and sizes", async () => {
+    await seed();
+
+    // Verify category
+    const categoryResult = await db.select().from(categories);
+    expect(categoryResult).toHaveLength(1);
+    expect(categoryResult[0]?.name).toBe("Luxury Bathrobes");
+    expect(categoryResult[0]?.slug).toBe("luxury-bathrobes");
+
+    // Verify product
+    const productResult = await db.select().from(products);
+    expect(productResult).toHaveLength(1);
+    expect(productResult[0]?.name).toBe("Test Bathrobe");
+    expect(productResult[0]?.slug).toBe("test-bathrobe");
+
+    // Verify colors
+    const colorResult = await db.select().from(productColors);
+    expect(colorResult).toHaveLength(1);
+    expect(colorResult[0]?.color).toBe("Blue");
+
+    // Verify sizes
+    const sizeResult = await db.select().from(productSizes);
+    expect(sizeResult).toHaveLength(2);
+    expect(sizeResult.map((s) => s.size).sort()).toEqual(["L", "M"]);
+    expect(sizeResult.every((s) => s.quantity === 1)).toBe(true);
+  });
+
+  it("should update existing products instead of creating duplicates", async () => {
+    // First seed
+    await seed();
+
+    // Verify initial state
+    const initialCounts = await getTableCounts();
+
+    // Second seed
+    await seed();
+
+    // Verify counts haven't changed
+    const finalCounts = await getTableCounts();
+    expect(finalCounts).toEqual(initialCounts);
+  });
+
+  // Helper function to get table counts
+  async function getTableCounts() {
+    const [categoryCount, productCount, colorCount] = await Promise.all([
+      db.select().from(categories),
+      db.select().from(products),
+      db.select().from(productColors),
+    ]);
+
+    return {
+      categories: categoryCount.length,
+      products: productCount.length,
+      colors: colorCount.length,
+    };
+  }
+
+  it("should set quantity to 0 for products not in XML", async () => {
+    // First seed with mock data
+    await seed();
+
+    if (!mockProducts[0] || !mockProducts[1]) {
+      throw new Error("Mock data not found");
+    }
+
+    // Change mock data to simulate removed product
+    vi.mocked(getXMLProducts).mockResolvedValue([mockProducts[0]]);
+
+    // Seed again
+    await seed();
+
+    const sizes = await db.select().from(productSizes);
+    const removedSize = sizes.find((s) => s.ean === mockProducts[1]?.ean);
+
+    expect(removedSize?.quantity).toBe(0);
   });
 });
-
-// // Mock environment variables
-// vi.mock("~/env", () => ({
-//   env: {
-//     XML_URL: "http://example.com/test.xml",
-//   },
-// }));
-
-// vi.mock("process", () => ({
-//   exit: vi.fn(),
-// }));
-
-// vi.mock(".", () => ({
-//   db: {
-//     insert: vi.fn(() => ({
-//       values: vi.fn(() => ({
-//         onConflictDoUpdate: vi.fn(() => ({
-//           returning: vi.fn(() => [{ id: faker.string.uuid() }]),
-//         })),
-//       })),
-//     })),
-//     update: vi.fn(() => ({
-//       set: vi.fn(() => ({
-//         where: vi.fn(),
-//       })),
-//     })),
-//   },
-// }));
-
-// // Mock getXMLProducts
-// vi.mock("./utils", () => ({
-//   getXMLProducts: vi.fn(),
-// }));
-
-// describe("Database seeding", () => {
-//   beforeEach(() => {
-//     vi.clearAllMocks();
-//     // Reset module cache before each test
-//     vi.resetModules();
-//   });
-
-//   it("should process products and insert into database", async () => {
-//     const mockProducts = Array.from({ length: 3 }, () => ({
-//       ean: faker.string.numeric(13),
-//       name: faker.commerce.productName(),
-//       categoryName: faker.commerce.department(),
-//       color: faker.color.human(),
-//       size: faker.helpers.arrayElement(["S", "M", "L", "XL"]),
-//       quantity: faker.number.int({ min: 0, max: 100 }),
-//       available: true,
-//     }));
-
-//     (getXMLProducts as any).mockResolvedValue(mockProducts);
-
-//     const mockInsert = vi.fn().mockReturnValue({
-//       values: vi.fn().mockReturnValue({
-//         onConflictDoUpdate: vi.fn().mockReturnValue({
-//           returning: vi.fn().mockReturnValue([{ id: faker.string.uuid() }]),
-//         }),
-//       }),
-//     });
-
-//     (db.insert as any).mockImplementation(mockInsert);
-//     (db.update as any).mockImplementation(() => ({
-//       set: vi.fn().mockReturnValue({
-//         where: vi.fn(),
-//       }),
-//     }));
-
-//     await seed();
-
-//     expect(mockInsert).toHaveBeenCalledWith(categories);
-//     expect(mockInsert).toHaveBeenCalledWith(products);
-//     expect(mockInsert).toHaveBeenCalledWith(productColors);
-//     expect(mockInsert).toHaveBeenCalledWith(productSizes);
-//     expect(db.update).toHaveBeenCalled();
-//   });
-
-//   it("should handle database errors gracefully", async () => {
-//     const consoleErrorSpy = vi
-//       .spyOn(console, "error")
-//       .mockImplementation(() => {});
-//     const mockError = new Error("Database error");
-
-//     (getXMLProducts as any).mockResolvedValue([
-//       {
-//         ean: faker.string.numeric(13),
-//         name: faker.commerce.productName(),
-//         categoryName: faker.commerce.department(),
-//         color: faker.color.human(),
-//         size: faker.helpers.arrayElement(["S", "M", "L", "XL"]),
-//       },
-//     ]);
-
-//     (db.insert as any).mockImplementation(() => {
-//       console.error(mockError);
-//       throw mockError;
-//     });
-
-//     await expect(seed()).rejects.toThrow(mockError);
-//     expect(consoleErrorSpy).toHaveBeenCalled();
-//   });
-
-//   it("should handle duplicate products correctly", async () => {
-//     const duplicateProduct = {
-//       ean: faker.string.numeric(13),
-//       name: "Duplicate Product",
-//       categoryName: faker.commerce.department(),
-//       color: faker.color.human(),
-//       size: "M",
-//       quantity: 1,
-//       available: true,
-//     };
-
-//     const mockProducts = [duplicateProduct, duplicateProduct];
-//     (getXMLProducts as any).mockResolvedValue(mockProducts);
-
-//     const mockInsert = vi.fn().mockReturnValue({
-//       values: vi.fn().mockReturnValue({
-//         onConflictDoUpdate: vi.fn().mockReturnValue({
-//           returning: vi.fn().mockReturnValue([{ id: faker.string.uuid() }]),
-//         }),
-//       }),
-//     });
-
-//     (db.insert as any).mockImplementation(mockInsert);
-
-//     await seed();
-
-//     // Should be called 8 times total (2 products × 4 operations each)
-//     expect(db.insert).toHaveBeenCalledWith(products);
-//     expect(db.insert).toHaveBeenCalledTimes(8); // categories, products, colors, sizes for each product
-//   });
-
-//   it("should update existing product data", async () => {
-//     const existingProduct = {
-//       ean: faker.string.numeric(13),
-//       name: "Updated Product",
-//       categoryName: "Updated Category",
-//       color: "Updated Color",
-//       size: "L",
-//       quantity: 5,
-//       available: true,
-//     };
-
-//     (getXMLProducts as any).mockResolvedValue([existingProduct]);
-
-//     const mockOnConflictDoUpdate = vi.fn().mockReturnValue({
-//       returning: vi.fn().mockReturnValue([{ id: faker.string.uuid() }]),
-//     });
-
-//     (db.insert as any).mockImplementation(() => ({
-//       values: vi.fn().mockReturnValue({
-//         onConflictDoUpdate: mockOnConflictDoUpdate,
-//       }),
-//     }));
-
-//     await seed();
-
-//     expect(mockOnConflictDoUpdate).toHaveBeenCalled();
-//   });
-
-//   it("should handle empty XML product list", async () => {
-//     (getXMLProducts as any).mockResolvedValue([]);
-
-//     await seed();
-
-//     expect(db.insert).not.toHaveBeenCalled();
-//     expect(db.update).toHaveBeenCalledWith(productSizes);
-//   });
-
-//   it("should update quantities to zero for non-processed products", async () => {
-//     const mockProducts = [
-//       {
-//         ean: "1234567890123",
-//         name: faker.commerce.productName(),
-//         categoryName: faker.commerce.department(),
-//         color: faker.color.human(),
-//         size: "M",
-//         quantity: 1,
-//         available: true,
-//       },
-//     ];
-
-//     (getXMLProducts as any).mockResolvedValue(mockProducts);
-
-//     const mockUpdateSet = vi.fn().mockReturnValue({ where: vi.fn() });
-//     (db.update as any).mockReturnValue({ set: mockUpdateSet });
-
-//     const mockInsert = vi.fn().mockReturnValue({
-//       values: vi.fn().mockReturnValue({
-//         onConflictDoUpdate: vi.fn().mockReturnValue({
-//           returning: vi.fn().mockReturnValue([{ id: faker.string.uuid() }]),
-//         }),
-//       }),
-//     });
-
-//     (db.insert as any).mockImplementation(mockInsert);
-
-//     await seed();
-
-//     expect(mockUpdateSet).toHaveBeenCalledWith({
-//       quantity: 0,
-//       updatedAt: expect.any(Date),
-//     });
-//   });
-
-//   it("should handle invalid category data", async () => {
-//     const invalidProduct = {
-//       ean: faker.string.numeric(13),
-//       name: faker.commerce.productName(),
-//       categoryName: "", // invalid empty category
-//       color: faker.color.human(),
-//       size: "M",
-//       quantity: 1,
-//       available: true,
-//     };
-
-//     (getXMLProducts as any).mockResolvedValue([invalidProduct]);
-
-//     const mockInsert = vi.fn().mockReturnValue({
-//       values: vi.fn().mockReturnValue({
-//         onConflictDoUpdate: vi.fn().mockReturnValue({
-//           returning: vi.fn().mockReturnValue([]), // Return empty array to simulate no category found
-//         }),
-//       }),
-//     });
-
-//     (db.insert as any).mockImplementation(mockInsert);
-
-//     await expect(seed()).rejects.toThrow("Category not found: ");
-//   });
-
-//   it("should maintain data consistency on partial failures", async () => {
-//     const mockProducts = Array.from({ length: 3 }, () => ({
-//       ean: faker.string.numeric(13),
-//       name: faker.commerce.productName(),
-//       categoryName: faker.commerce.department(),
-//       color: faker.color.human(),
-//       size: faker.helpers.arrayElement(["S", "M", "L", "XL"]),
-//       quantity: 1,
-//       available: true,
-//     }));
-
-//     (getXMLProducts as any).mockResolvedValue(mockProducts);
-
-//     let callCount = 0;
-//     (db.insert as any).mockImplementation(() => {
-//       callCount++;
-//       if (callCount === 2) {
-//         throw new Error("Simulated database error");
-//       }
-//       return {
-//         values: vi.fn().mockReturnValue({
-//           onConflictDoUpdate: vi.fn().mockReturnValue({
-//             returning: vi.fn().mockReturnValue([{ id: faker.string.uuid() }]),
-//           }),
-//         }),
-//       };
-//     });
-
-//     await expect(seed()).rejects.toThrow("Simulated database error");
-//   });
-
-//   it("should handle special characters in product names", async () => {
-//     const specialProduct = {
-//       ean: faker.string.numeric(13),
-//       name: "Product with special chars: @#$%",
-//       categoryName: faker.commerce.department(),
-//       color: faker.color.human(),
-//       size: "M",
-//       quantity: 1,
-//       available: true,
-//     };
-
-//     (getXMLProducts as any).mockResolvedValue([specialProduct]);
-
-//     await seed();
-
-//     expect(db.insert).toHaveBeenCalledWith(products);
-//   });
-// });
