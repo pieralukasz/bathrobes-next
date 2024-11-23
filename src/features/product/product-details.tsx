@@ -31,7 +31,7 @@ import { useAction } from "next-safe-action/hooks";
 import { useCart } from "../cart/cart-context";
 import { productQueries } from "~/server/db/queries";
 import { IncrementorInput } from "~/components/ui/incrementor-input";
-
+import { toast } from "sonner";
 export type ProductWithDetails = Awaited<
   NonNullable<ReturnType<typeof productQueries.getProduct>>
 >;
@@ -119,6 +119,10 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
     execute({
       productSizeId: selectedSize.id,
       quantity: data.quantity,
+    });
+
+    toast.success("Cart updated", {
+      duration: 3000,
     });
   };
 
