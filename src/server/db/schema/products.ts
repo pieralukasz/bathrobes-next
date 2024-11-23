@@ -7,7 +7,21 @@ import {
   unique,
 } from "drizzle-orm/pg-core";
 import { timestampColumns } from "./timestamp";
-import { categories } from "./categories";
+
+export const categories = pgTable(
+  "categories",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar("name", { length: 256 }).notNull(),
+    slug: varchar("slug", { length: 256 }).notNull(),
+    ...timestampColumns,
+  },
+  (table) => ({
+    slugUnq: unique().on(table.slug),
+  }),
+);
+
+export type InferCategory = typeof categories.$inferSelect;
 
 export const products = pgTable(
   "products",

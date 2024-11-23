@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
-import { categories } from "./categories";
-import { productColors, productSizes, products } from "./products";
+import { categories, productColors, productSizes, products } from "./products";
 import { basketItems, baskets } from "./baskets";
 import { orderItems, orders } from "./orders";
 

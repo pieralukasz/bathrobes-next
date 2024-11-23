@@ -1,8 +1,12 @@
 import { slugCreator } from "~/lib/utils";
 import { db } from ".";
 import { getXMLProducts } from "./utils";
-import { categories } from "./schema/categories";
-import { productColors, productSizes, products } from "./schema/products";
+import {
+  categories,
+  productColors,
+  productSizes,
+  products,
+} from "./schema/products";
 import { inArray, not } from "drizzle-orm";
 
 async function seed() {

@@ -1,12 +1,9 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { sql } from "drizzle-orm";
-import { afterAll, afterEach, beforeEach, vi } from "vitest";
+import { afterAll, vi } from "vitest";
 
 import * as schema from "../server/db/schema";
 import { db } from "../server/db";
-import { applyMigrations } from "../server/db/migrate";
-import { env } from "~/env";
 
 vi.mock("~/env", () => ({
   env: {

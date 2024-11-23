@@ -43,8 +43,8 @@ async function setupTestDb() {
     console.log("📊 Pushing database schema...");
     await execAsync("npm run db:push");
 
-    // console.log("🌱 Seeding database...");
-    // await execAsync("npm run db:seed");
+    console.log("🌱 Seeding database...");
+    await execAsync("npm run db:seed");
 
     console.log("✅ Database setup completed successfully!");
   } catch (error) {
