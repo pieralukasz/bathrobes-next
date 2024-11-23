@@ -1,28 +1,37 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { afterAll, vi } from "vitest";
+import { afterAll, beforeAll, vi } from "vitest";
 
 import * as schema from "../server/db/schema";
 import { db } from "../server/db";
+import { beforeEach } from "node:test";
+import seed from "~/server/db/seed";
 
 vi.mock("~/env", () => ({
   env: {
     XML_URL: "http://example.com/test.xml",
+    DATABASE_URL: "postgres://drizzle:drizzle@localhost:5433/local_db",
   },
 }));
 
 vi.mock("../server/db", async (importOriginal) => {
-  const client = postgres("postgres://drizzle:drizzle@localhost:5433/tests", {
-    max: 1,
-  });
+  const client = postgres(
+    "postgres://drizzle:drizzle@localhost:5433/local_db",
+    {
+      max: 1,
+    },
+  );
 
   const db = drizzle(client, { schema });
 
   return {
-    ...(await importOriginal<typeof import("../server/db")>()),
     db,
     client,
   };
+});
+
+beforeAll(async () => {
+  await seed();
 });
 
 afterAll(async () => {

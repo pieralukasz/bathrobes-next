@@ -1,3 +1,4 @@
+// This script uses test database configuration from .env.test
 import { exec } from "child_process";
 import { promisify } from "util";
 import postgres from "postgres";
@@ -19,7 +20,7 @@ async function setupTestDb() {
     const sql = postgres({
       host: "localhost",
       port: 5433,
-      database: "tests",
+      database: "local_db",
       username: "drizzle",
       password: "drizzle",
     });
@@ -41,10 +42,10 @@ async function setupTestDb() {
     }
 
     console.log("📊 Pushing database schema...");
-    await execAsync("npm run db:push");
+    await execAsync("npm run db:push:test");
 
     console.log("🌱 Seeding database...");
-    await execAsync("npm run db:seed");
+    await execAsync("npm run db:seed:test");
 
     console.log("✅ Database setup completed successfully!");
   } catch (error) {

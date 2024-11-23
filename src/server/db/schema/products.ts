@@ -12,6 +12,7 @@ export const categories = pgTable(
   "categories",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    description: varchar("description", { length: 512 }),
     name: varchar("name", { length: 256 }).notNull(),
     slug: varchar("slug", { length: 256 }).notNull(),
     ...timestampColumns,

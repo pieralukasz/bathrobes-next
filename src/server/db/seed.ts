@@ -9,7 +9,7 @@ import {
 } from "./schema/products";
 import { inArray, not } from "drizzle-orm";
 
-async function seed() {
+async function seed(database = db) {
   const productsFromXML = await getXMLProducts();
   console.log(`Parsed ${productsFromXML.length} products from XML.`);
 
@@ -18,7 +18,7 @@ async function seed() {
   for (const item of productsFromXML) {
     const { ean, name, categoryName, color, size } = item;
 
-    const [category] = await db
+    const [category] = await database
       .insert(categories)
       .values({ name: categoryName, slug: slugCreator(categoryName) })
       .onConflictDoUpdate({
@@ -35,7 +35,7 @@ async function seed() {
       console.log(`Inserted/Found category ID: ${categoryId}`);
     }
 
-    const [product] = await db
+    const [product] = await database
       .insert(products)
       .values({
         name,
@@ -56,7 +56,7 @@ async function seed() {
       console.log(`Inserted/Found product ID: ${productId}`);
     }
 
-    const [productColor] = await db
+    const [productColor] = await database
       .insert(productColors)
       .values({ productId, color })
       .onConflictDoUpdate({
@@ -73,7 +73,7 @@ async function seed() {
       console.log(`Inserted/Found color ID: ${colorId}`);
     }
 
-    await db
+    await database
       .insert(productSizes)
       .values({
         colorId,
@@ -91,7 +91,7 @@ async function seed() {
     console.log(`Inserted size for color ID ${colorId}, EAN ${ean}`);
   }
 
-  await db
+  await database
     .update(productSizes)
     .set({
       quantity: 0,
@@ -107,13 +107,16 @@ export default seed;
 
 // Execute if running as main script
 if (require.main === module) {
+  console.log(`Seeding database in ${process.env.NODE_ENV} environment...`);
   seed()
     .catch((e) => {
       console.error("Error seeding database:", e);
       process.exit(1);
     })
     .then(() => {
-      console.log("Database seeding completed successfully!");
+      console.log(
+        `Database seeding completed successfully in ${process.env.NODE_ENV} environment!`,
+      );
       process.exit(0);
     });
 }

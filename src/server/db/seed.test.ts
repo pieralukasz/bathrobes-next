@@ -42,6 +42,7 @@ describe("Database seeding with mock data", () => {
       .from(categories)
       .where(eq(categories.name, "Luxury Bathrobes"))
       .limit(1);
+
     expect(categoryResult[0]?.name).toBe("Luxury Bathrobes");
     expect(categoryResult[0]?.slug).toBe("luxury-bathrobes");
 
@@ -77,6 +78,7 @@ describe("Database seeding with mock data", () => {
     if (!mockProducts[0]?.ean) throw new Error("Mock product EAN not found");
 
     const secondEan = mockProducts[1]?.ean;
+
     if (!secondEan) throw new Error("Mock product EAN not found");
 
     vi.mocked(getXMLProducts).mockResolvedValue([mockProducts[0]]);
@@ -86,6 +88,7 @@ describe("Database seeding with mock data", () => {
       .select()
       .from(productSizes)
       .where(eq(productSizes.ean, secondEan));
+
     expect(sizes[0]?.quantity).toBe(0);
   });
 });
