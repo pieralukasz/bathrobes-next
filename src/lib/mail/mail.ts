@@ -1,16 +1,24 @@
-import nodemailer from "nodemailer";
+import { createTransport } from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { env } from "~/env";
 
-export async function sendMail({
-  to,
-  subject,
-  body,
-}: {
+interface SendMailParams {
   to: string;
   subject: string;
   body: string;
-}) {
-  const transport = nodemailer.createTransport({
+  attachments?: Array<{
+    filename: string;
+    content: Buffer;
+  }>;
+}
+
+export const sendMail = async ({
+  to,
+  subject,
+  body,
+  attachments,
+}: SendMailParams): Promise<SMTPTransport.SentMessageInfo> => {
+  const transport = createTransport({
     host: "mail.gmx.com",
     port: 465,
     secure: true,
@@ -25,12 +33,11 @@ export async function sendMail({
 
   await transport.verify();
 
-  const sendResult = await transport.sendMail({
+  return transport.sendMail({
     from: env.NEXT_PUBLIC_SMTP_EMAIL,
     to,
     subject,
     html: body,
+    attachments,
   });
-
-  return sendResult;
-}
+};

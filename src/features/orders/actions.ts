@@ -4,6 +4,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { sendMail } from "~/lib/mail/mail";
 import { getUser } from "~/lib/supabase/server";
 import { orderQueries } from "~/server/db/queries";
+import { generateOrderExcel } from "./excel";
 
 const formatOrderDetails = async (orderId: number, userId: string) => {
   const order = await orderQueries.getOrderByIdAndUserId(orderId, userId);
@@ -42,12 +43,24 @@ export const sendOrder = async (
     throw new Error("User email not found");
   }
 
+  const order = await orderQueries.getOrderByIdAndUserId(orderId, user.id);
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
   const emailBody = await formatOrderDetails(orderId, user.id);
+  const excelBuffer = await generateOrderExcel(order);
 
   const dataResult = await sendMail({
     to: user.email,
     subject: `L&L Bathrobe #${orderId}`,
     body: emailBody,
+    attachments: [
+      {
+        filename: `order-${orderId}.xlsx`,
+        content: excelBuffer,
+      },
+    ],
   });
 
   if (!dataResult) {
