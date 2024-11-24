@@ -23,8 +23,8 @@ export const SignInForm = () => {
       },
       actionProps: {
         onSuccess: () => {
-          window.alert("You've got mail!");
           resetFormAndAction();
+          window.alert("You've got mail!");
         },
       },
     });
