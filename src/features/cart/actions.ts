@@ -56,6 +56,18 @@ export const addToCartAction = actionClient
     }
   });
 
+export const createCartAction = actionClient.action(async () => {
+  try {
+    const user = await getUser();
+    await basketMutations.create(user.id);
+    revalidateTag(CACHE_TAGS.cart);
+    return { success: true };
+  } catch (e) {
+    console.error(e);
+    return { error: "Error creating cart" };
+  }
+});
+
 export const removeItemAction = actionClient
   .schema(removeItemSchema)
   .action(async ({ parsedInput: { basketItemId } }) => {

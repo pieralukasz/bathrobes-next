@@ -32,6 +32,7 @@ import { useCart } from "../cart/cart-context";
 import { productQueries } from "~/server/db/queries";
 import { IncrementorInput } from "~/components/ui/incrementor-input";
 import { toast } from "sonner";
+
 export type ProductWithDetails = Awaited<
   NonNullable<ReturnType<typeof productQueries.getProduct>>
 >;

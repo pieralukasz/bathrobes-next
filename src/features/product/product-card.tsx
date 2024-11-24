@@ -9,8 +9,14 @@ interface ProductCardProps {
   product: ProductWithDetails;
 }
 
+const defaultImageUrl = "/logo.jpg";
+
 export const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
+
+  const availableImage = product?.colors
+    .flatMap((color) => color.imageUrl)
+    .filter((url) => url)[0];
 
   if (!product) {
     return null;
@@ -26,12 +32,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       onClick={handleClick}
     >
       <CardContent className="p-0">
-        <div className="relative aspect-[4/3] w-full">
+        <div className="relative flex h-52 w-full items-center justify-center">
           <img
-            src="https://alfxflqvzegvbpsvtzih.supabase.co/storage/v1/object/public/photos/2018_patti_grafit.png"
+            src={availableImage || defaultImageUrl}
             alt={product.name}
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="h-full w-full object-cover"
           />
         </div>
         <div className="p-2 text-center">
