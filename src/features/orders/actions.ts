@@ -39,7 +39,7 @@ export const sendOrder = async (
 ): Promise<SMTPTransport.SentMessageInfo> => {
   const user = await getUser();
 
-  if (!user.email) {
+  if (!user?.email) {
     throw new Error("User email not found");
   }
 
