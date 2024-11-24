@@ -6,13 +6,15 @@ import { getUser } from "~/lib/supabase/server";
 export default async function OrderPage({
   params,
 }: {
-  params: { orderId: string };
+  params: Promise<{ orderId: string }>;
 }) {
   const user = await getUser();
+
+  const paramsAwaited = await params;
   if (!user?.id) return null;
 
   const order = await orderQueries.getOrderByIdAndUserId(
-    parseInt(params.orderId),
+    parseInt(paramsAwaited.orderId),
     user.id,
   );
 
