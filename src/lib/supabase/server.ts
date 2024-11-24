@@ -37,9 +37,5 @@ export const getUser = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
-
   return user;
 };

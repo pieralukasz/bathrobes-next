@@ -46,7 +46,11 @@ export const SignInForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="ll@bathrobe.com" {...field} />
+                <Input
+                  className="w-full"
+                  placeholder="ll@bathrobe.com"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
