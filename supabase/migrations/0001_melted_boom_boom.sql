@@ -1,1 +1,0 @@
-ALTER TABLE "categories" ADD COLUMN "test" varchar(256);

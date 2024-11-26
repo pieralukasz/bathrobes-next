@@ -9,7 +9,7 @@ import {
 } from "./schema/products";
 import { inArray, not } from "drizzle-orm";
 
-async function seed(database = db) {
+async function seed() {
   const productsFromXML = await getXMLProducts();
   console.log(`Parsed ${productsFromXML.length} products from XML.`);
 
@@ -18,7 +18,7 @@ async function seed(database = db) {
   for (const item of productsFromXML) {
     const { ean, name, categoryName, color, size } = item;
 
-    const [category] = await database
+    const [category] = await db
       .insert(categories)
       .values({ name: categoryName, slug: slugCreator(categoryName) })
       .onConflictDoUpdate({
@@ -35,7 +35,7 @@ async function seed(database = db) {
       console.log(`Inserted/Found category ID: ${categoryId}`);
     }
 
-    const [product] = await database
+    const [product] = await db
       .insert(products)
       .values({
         name,
@@ -56,7 +56,7 @@ async function seed(database = db) {
       console.log(`Inserted/Found product ID: ${productId}`);
     }
 
-    const [productColor] = await database
+    const [productColor] = await db
       .insert(productColors)
       .values({ productId, color })
       .onConflictDoUpdate({
@@ -73,7 +73,7 @@ async function seed(database = db) {
       console.log(`Inserted/Found color ID: ${colorId}`);
     }
 
-    await database
+    await db
       .insert(productSizes)
       .values({
         colorId,
@@ -91,7 +91,7 @@ async function seed(database = db) {
     console.log(`Inserted size for color ID ${colorId}, EAN ${ean}`);
   }
 
-  await database
+  await db
     .update(productSizes)
     .set({
       quantity: 0,
@@ -105,18 +105,14 @@ async function seed(database = db) {
 // Export for testing
 export default seed;
 
-// Execute if running as main script
-if (require.main === module) {
-  console.log(`Seeding database in ${process.env.NODE_ENV} environment...`);
-  seed()
-    .catch((e) => {
-      console.error("Error seeding database:", e);
-      process.exit(1);
-    })
-    .then(() => {
-      console.log(
-        `Database seeding completed successfully in ${process.env.NODE_ENV} environment!`,
-      );
-      process.exit(0);
-    });
-}
+seed()
+  .catch((e) => {
+    console.error("Error seeding database:", e);
+    process.exit(1);
+  })
+  .then(() => {
+    console.log(
+      `Database seeding completed successfully in ${process.env.NODE_ENV} environment!`,
+    );
+    process.exit(0);
+  });

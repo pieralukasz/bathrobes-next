@@ -42,6 +42,7 @@ export const products = pgTable(
     categoryIdx: index("products_category_id_idx").on(table.categoryId),
     slugIdx: index("products_slug_idx").on(table.slug),
     slugUnq: unique("products_slug_unique").on(table.slug),
+    nameUnq: unique("products_name_unique").on(table.name), // Ensure this line is present
   }),
 );
 
@@ -52,6 +53,9 @@ export const productColors = pgTable(
     productId: integer("product_id")
       .references(() => products.id)
       .notNull(),
+    productName: varchar("product_name", { length: 256 }).references(
+      () => products.name,
+    ),
     color: varchar("color", { length: 50 }).notNull(),
     imageUrl: varchar("image_url", { length: 256 }),
     ...timestampColumns,

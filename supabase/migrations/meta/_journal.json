@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1731858198220,
-      "tag": "0000_good_nuke",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1732369823109,
-      "tag": "0001_melted_boom_boom",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1732369846086,
-      "tag": "0002_glossy_human_cannonball",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1732369965191,
-      "tag": "0003_premium_dark_phoenix",
+      "when": 1732633500258,
+      "tag": "0000_sweet_emma_frost",
       "breakpoints": true
     }
   ]
