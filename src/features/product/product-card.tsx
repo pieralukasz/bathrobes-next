@@ -10,7 +10,7 @@ interface ProductCardProps {
   product: ProductWithDetails;
 }
 
-export const ProductCard = async ({ product }: ProductCardProps) => {
+export const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
 
   const availableImage = product?.colors
@@ -39,6 +39,7 @@ export const ProductCard = async ({ product }: ProductCardProps) => {
         <div className="relative flex h-52 w-full items-center justify-center">
           <img
             src={availableImage || imageSupabasePath}
+            defaultValue={defaultImageUrl}
             alt={product.name}
             className="h-full w-full object-cover"
             onError={(e) => {

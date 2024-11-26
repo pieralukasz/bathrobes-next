@@ -9,7 +9,6 @@ import {
 } from "~/components/ui/card";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
-import { Input } from "~/components/ui/input";
 import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -32,7 +31,7 @@ import { useCart } from "../cart/cart-context";
 import { productQueries } from "~/server/db/queries";
 import { IncrementorInput } from "~/components/ui/incrementor-input";
 import { toast } from "sonner";
-import { getMaybeImageUrl } from "./utils";
+import { defaultImageUrl, getMaybeImageUrl } from "./utils";
 
 export type ProductWithDetails = Awaited<
   NonNullable<ReturnType<typeof productQueries.getProduct>>
@@ -62,7 +61,7 @@ const getProductDefaultsByEan = (product: ProductWithDetails, ean?: string) => {
   };
 };
 
-export const ProductDetails = async ({ product, ean }: ProductDetailsProps) => {
+export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
   if (!product) return null;
 
   const { defaultColor, defaultSize } = getProductDefaultsByEan(product, ean);
@@ -110,11 +109,13 @@ export const ProductDetails = async ({ product, ean }: ProductDetailsProps) => {
     return "Add to cart";
   };
 
-  const imageUrl = product?.colors
-    .flatMap((color) => color.imageUrl)
-    .filter((url) => url?.includes(selectedColor))[0];
+  const imageUrl = product.colors.find(
+    (c) => c.color === selectedColor,
+  )?.imageUrl;
 
-  const imageSupabasePath = getMaybeImageUrl(product.name, selectedColor);
+  const maybeImageUrl = useMemo(() => {
+    return getMaybeImageUrl(product.name, selectedColor);
+  }, [product.name, selectedColor]);
 
   const onSubmit = async (data: ProductDetailsFormData) => {
     const selectedColor = product.colors.find((c) => c.color === data.color);
@@ -138,7 +139,14 @@ export const ProductDetails = async ({ product, ean }: ProductDetailsProps) => {
     <Card className="mx-auto w-full max-w-3xl">
       <div className="flex gap-4">
         <div className="flex w-1/2 items-center justify-center p-8">
-          <img src={imageUrl ?? imageSupabasePath} alt={product.name} />
+          <img
+            src={imageUrl ?? maybeImageUrl}
+            alt={product.name}
+            className="h-full w-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = defaultImageUrl;
+            }}
+          />
         </div>
         <div className="flex w-1/2 flex-col justify-center">
           <CardHeader className="pb-4">
