@@ -1,7 +1,6 @@
 import { SignOutButton } from "~/features/auth/sign-out-button";
 import { ThemeSwitcher } from "./theme-switcher";
 import { getUser } from "~/lib/supabase/server";
-import Link from "next/link";
 
 export const Footer = async () => {
   const user = await getUser();
@@ -11,7 +10,6 @@ export const Footer = async () => {
       <p className="hidden sm:block">
         Powered by <span className="font-bold">Lucas Piera</span>
       </p>
-      <Link href="/orders">My Orders</Link>
       <ThemeSwitcher />
       {user?.id && <SignOutButton />}
     </footer>

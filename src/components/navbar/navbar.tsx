@@ -23,8 +23,18 @@ export const Navbar = async () => {
             </div>
           </div>
         )}
+
         <div className="flex w-[90px] items-center justify-end gap-5">
-          {!user ? <HeaderAuth /> : <CartModal />}
+          {!user ? (
+            <HeaderAuth />
+          ) : (
+            <div className="flex items-center justify-end gap-10">
+              <Link href="/orders" className="hidden md:block">
+                Orders
+              </Link>
+              <CartModal />
+            </div>
+          )}
         </div>
       </div>
     </nav>

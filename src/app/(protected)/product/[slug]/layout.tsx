@@ -4,7 +4,7 @@ export default function ProductLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex w-full flex-grow items-center justify-center pt-4">
+    <div className="flex w-full flex-grow items-center justify-center">
       {children}
     </div>
   );

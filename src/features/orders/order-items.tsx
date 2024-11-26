@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn, createUrl } from "~/lib/utils";
+import { defaultImageUrl, getMaybeImageUrl } from "../product/utils";
 
 interface OrderItemsProps {
   items: any[];
@@ -17,6 +18,13 @@ export const OrderItems = ({ items }: OrderItemsProps) => {
           const productUrl = createUrl(
             `/product/${item.productSize.color.product.slug}`,
             params,
+          );
+
+          const imageUrl = item.productSize.color.imageUrl;
+
+          const maybeImageUrl = getMaybeImageUrl(
+            item.productSize.color.productName,
+            item.productSize.color.color,
           );
 
           return (
@@ -37,6 +45,16 @@ export const OrderItems = ({ items }: OrderItemsProps) => {
                       src="https://alfxflqvzegvbpsvtzih.supabase.co/storage/v1/object/public/photos/2018_patti_grafit.png"
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    <img
+                      src={imageUrl ?? maybeImageUrl}
+                      defaultValue={defaultImageUrl}
+                      alt={item.productSize.color.color}
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onError={(e) => {
+                        e.currentTarget.src = defaultImageUrl;
+                      }}
                     />
                   </div>
                   <div className="ml-2 flex flex-row space-x-4">

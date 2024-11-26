@@ -7,6 +7,7 @@ import { cn, createUrl } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
 import { removeItemAction } from "./actions";
+import { defaultImageUrl, getMaybeImageUrl } from "../product/utils";
 
 interface CartItemsProps {
   onItemClick?: () => void;
@@ -42,6 +43,13 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
             params,
           );
 
+          const imageUrl = product.productSize.color.imageUrl;
+
+          const maybeImageUrl = getMaybeImageUrl(
+            product.productSize.color.productName,
+            product.productSize.color.color,
+          );
+
           return (
             <li
               key={i}
@@ -58,10 +66,14 @@ export const CartItems = ({ onItemClick }: CartItemsProps) => {
                 >
                   <div className="relative w-16 border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:hover:bg-neutral-800">
                     <img
-                      src="https://alfxflqvzegvbpsvtzih.supabase.co/storage/v1/object/public/photos/2018_patti_grafit.png"
-                      // alt={product.productSize.color.imageUrl}
+                      src={imageUrl ?? maybeImageUrl}
+                      defaultValue={defaultImageUrl}
+                      alt={product.productSize.color.color}
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      onError={(e) => {
+                        e.currentTarget.src = defaultImageUrl;
+                      }}
                     />
                     <Button
                       variant="ghost"
