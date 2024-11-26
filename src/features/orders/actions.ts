@@ -28,15 +28,13 @@ const formatOrderDetails = async (orderId: number, userId: string) => {
         .map(
           (item) => `
         <li>
-          ${item.productSize.color.product.name} - ${item.productSize.color.color} - Size: ${item.productSize.size}
-          <br/>
-          Quantity: ${item.quantity}
+          ${item.productSize.color.product.name} / ${item.productSize.color.color} / ${item.productSize.size} / ${item.quantity}
         </li>
       `,
         )
         .join("")}
     </ul>
-    <p>Your note: ${order.note}</p>
+    ${order.note ? `<p>Note: ${order.note}</p>` : ""}
     <p>If you have any questions, please contact our support team.</p>
   `;
 };
