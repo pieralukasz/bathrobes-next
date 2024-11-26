@@ -4,8 +4,7 @@ import { afterAll, beforeAll, vi } from "vitest";
 
 import * as schema from "../server/db/schema";
 import { db } from "../server/db";
-import { beforeEach } from "node:test";
-import seed from "~/server/db/seed";
+import { seedDatabase } from "~/server/db/seed";
 
 vi.mock("~/env", () => ({
   env: {
@@ -31,7 +30,7 @@ vi.mock("../server/db", async (importOriginal) => {
 });
 
 beforeAll(async () => {
-  await seed();
+  await seedDatabase();
 });
 
 afterAll(async () => {
