@@ -2,6 +2,7 @@ import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "~/lib/supabase/server";
+import { basketMutations } from "~/server/db/mutations";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -17,12 +18,13 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.verifyOtp({
+    const { error, data } = await supabase.auth.verifyOtp({
       type,
       token_hash,
     });
 
-    if (!error) {
+    if (!error && data?.user) {
+      await basketMutations.create(data.user?.id);
       redirectTo.searchParams.delete("next");
       return NextResponse.redirect(redirectTo);
     }

@@ -19,7 +19,7 @@ export class OrderError extends Error {
 }
 
 export const orderMutations = {
-  create: async (userId: string) => {
+  create: async (userId: string, note?: string) => {
     if (!userId) throw new OrderError("INVALID_INPUT", "User ID is required");
 
     console.log("Starting order creation for user:", userId);
@@ -60,7 +60,7 @@ export const orderMutations = {
         console.log("Creating order...");
         const [newOrder] = await tx
           .insert(orders)
-          .values({ userId })
+          .values({ userId, note })
           .returning();
 
         if (!newOrder?.id) {

@@ -1,6 +1,6 @@
 {
-  "id": "0887c7c8-0bfe-4873-b255-734b8816ab83",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "f358d44c-2730-492a-9c6d-22da7dbafc20",
+  "prevId": "0887c7c8-0bfe-4873-b255-734b8816ab83",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -238,6 +238,13 @@
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
+        },
+        "visible": {
+          "name": "visible",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         },
         "created_at": {
           "name": "created_at",

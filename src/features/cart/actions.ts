@@ -6,10 +6,9 @@ import { actionClient } from "~/lib/safe-action";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "~/lib/constants";
 import { addToCartSchema, updateCartSchema, removeItemSchema } from "./schema";
-import { basketMutations, orderMutations } from "~/server/db/mutations";
+import { basketMutations } from "~/server/db/mutations";
 import { basketQueries } from "~/server/db/queries";
 import { getUser as getUserSupabase } from "~/lib/supabase/server";
-import { sendOrder } from "../orders/actions";
 
 const getUser = async () => {
   try {
@@ -21,7 +20,7 @@ const getUser = async () => {
   }
 };
 
-const getCart = async (userId: string) => {
+export const getCart = async (userId: string) => {
   try {
     const cart = await basketQueries.getByUserId(userId);
     if (!cart) throw new Error("Cart not found");
@@ -123,42 +122,5 @@ export const clearCartAction = actionClient.action(async () => {
   } catch (e) {
     console.error(e);
     return { error: "Error clearing cart" };
-  }
-});
-
-export const checkoutAction = actionClient.action(async () => {
-  try {
-    const user = await getUser();
-    const cart = await getCart(user.id);
-
-    if (!cart || cart.items.length === 0) {
-      return { error: "Cannot create order with empty basket" };
-    }
-
-    const order = await orderMutations.create(user.id);
-
-    if (!order) {
-      return { error: "Failed to create order" };
-    }
-
-    let emailSent = true;
-    try {
-      await sendOrder(order.id);
-    } catch (mailError) {
-      console.error("Failed to send order email:", mailError);
-      emailSent = false;
-    }
-
-    revalidateTag(CACHE_TAGS.cart);
-    revalidateTag(CACHE_TAGS.orders);
-
-    return {
-      success: true,
-      orderId: order.id,
-      emailSent,
-    };
-  } catch (e: any) {
-    console.error("Checkout error:", e);
-    return { error: e.message || "Error checking out" };
   }
 });

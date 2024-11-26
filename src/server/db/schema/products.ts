@@ -15,6 +15,7 @@ export const categories = pgTable(
     description: varchar("description", { length: 512 }),
     name: varchar("name", { length: 256 }).notNull(),
     slug: varchar("slug", { length: 256 }).notNull(),
+    visible: boolean("visible").default(true).notNull(),
     ...timestampColumns,
   },
   (table) => ({
@@ -53,9 +54,9 @@ export const productColors = pgTable(
     productId: integer("product_id")
       .references(() => products.id)
       .notNull(),
-    productName: varchar("product_name", { length: 256 }).references(
-      () => products.name,
-    ),
+    productName: varchar("product_name", { length: 256 })
+      .references(() => products.name)
+      .notNull(),
     color: varchar("color", { length: 50 }).notNull(),
     imageUrl: varchar("image_url", { length: 256 }),
     ...timestampColumns,

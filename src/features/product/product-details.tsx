@@ -123,7 +123,7 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
     });
 
     toast.success("Cart updated", {
-      duration: 3000,
+      duration: 1000,
     });
   };
 

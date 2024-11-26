@@ -1,12 +1,13 @@
 import { db } from "..";
-import { eq, like, or } from "drizzle-orm";
+import { eq, like, or, and } from "drizzle-orm";
 
 export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
 export const productQueries = {
   getCategory: async (slug: string) => {
     return await db.query.categories.findFirst({
-      where: (categories) => eq(categories.slug, slug),
+      where: (categories) =>
+        and(eq(categories.slug, slug), eq(categories.visible, true)),
       with: {
         products: true,
       },
@@ -15,6 +16,7 @@ export const productQueries = {
 
   getCategories: async () => {
     return await db.query.categories.findMany({
+      where: (categories) => eq(categories.visible, true),
       orderBy: (categories, { asc }) => asc(categories.name),
       with: {
         products: true,

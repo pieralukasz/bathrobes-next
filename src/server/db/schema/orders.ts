@@ -7,6 +7,7 @@ export const orders = pgTable(
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
     userId: varchar("user_id", { length: 256 }).notNull(),
+    note: varchar("note", { length: 512 }),
     ...timestampColumns,
   },
   (table) => ({
@@ -25,6 +26,7 @@ export const orderItems = pgTable(
       .references(() => productSizes.id)
       .notNull(),
     quantity: integer("quantity").notNull(),
+
     ...timestampColumns,
   },
   (table) => ({

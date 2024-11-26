@@ -23,7 +23,7 @@ async function seed() {
       .values({ name: categoryName, slug: slugCreator(categoryName) })
       .onConflictDoUpdate({
         target: [categories.slug],
-        set: { name: categoryName, updatedAt: new Date() },
+        set: { updatedAt: new Date() },
       })
       .returning({ id: categories.id });
 
@@ -46,19 +46,20 @@ async function seed() {
         target: [products.slug],
         set: { categoryId, updatedAt: new Date() },
       })
-      .returning({ id: products.id });
+      .returning({ id: products.id, name: products.name });
 
     const productId = product?.id;
+    const productName = product?.name;
 
-    if (!productId) {
+    if (!productId || !productName) {
       throw new Error(`Product not found: ${name}`);
     } else {
-      console.log(`Inserted/Found product ID: ${productId}`);
+      console.log(`Inserted/Found product ${name}: ${productId}`);
     }
 
     const [productColor] = await db
       .insert(productColors)
-      .values({ productId, color })
+      .values({ productId, color, productName })
       .onConflictDoUpdate({
         target: [productColors.productId, productColors.color], // Matches the unique constraint
         set: { updatedAt: new Date() },

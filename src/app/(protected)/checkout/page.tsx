@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { CartItems } from "~/features/cart/cart-items";
 
-import { CreateOrder } from "~/features/cart/create-order";
+import { CreateOrder } from "~/features/orders/create-order";
 import { getUser } from "~/lib/supabase/server";
 import { basketQueries } from "~/server/db/queries";
 

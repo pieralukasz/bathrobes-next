@@ -14,20 +14,23 @@ import { signInFormSchema } from "./schema";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInAction } from "./actions";
+import { toast } from "sonner";
 
 export const SignInForm = () => {
-  const { form, handleSubmitWithAction, resetFormAndAction } =
-    useHookFormAction(signInAction, zodResolver(signInFormSchema), {
-      formProps: {
-        mode: "onChange",
+  const {
+    form,
+    handleSubmitWithAction,
+    action: { status },
+  } = useHookFormAction(signInAction, zodResolver(signInFormSchema), {
+    formProps: {
+      mode: "onChange",
+    },
+    actionProps: {
+      onSuccess: () => {
+        toast.success("Check your email for a sign-in link.");
       },
-      actionProps: {
-        onSuccess: () => {
-          resetFormAndAction();
-          window.alert("You've got mail!");
-        },
-      },
-    });
+    },
+  });
 
   if (!form.control) {
     return null;
@@ -49,6 +52,11 @@ export const SignInForm = () => {
                 <Input
                   className="w-full"
                   placeholder="ll@bathrobe.com"
+                  disabled={
+                    form.formState.isSubmitting ||
+                    status === "executing" ||
+                    status === "hasSucceeded"
+                  }
                   {...field}
                 />
               </FormControl>
@@ -56,7 +64,14 @@ export const SignInForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button
+          type="submit"
+          disabled={
+            form.formState.isSubmitting ||
+            status === "executing" ||
+            status === "hasSucceeded"
+          }
+        >
           Submit
         </Button>
       </form>
