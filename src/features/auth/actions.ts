@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "~/lib/supabase/server";
 import { actionClient } from "~/lib/safe-action";
 import { signInFormSchema } from "./schema";
+import { env } from "~/env";
 
 export const signInAction = actionClient
   .schema(signInFormSchema)
@@ -14,6 +15,9 @@ export const signInAction = actionClient
       email,
       options: {
         shouldCreateUser: true,
+        emailRedirectTo: process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : "http://localhost:3000",
       },
     });
 
