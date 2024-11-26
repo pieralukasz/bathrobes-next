@@ -32,6 +32,7 @@ import { useCart } from "../cart/cart-context";
 import { productQueries } from "~/server/db/queries";
 import { IncrementorInput } from "~/components/ui/incrementor-input";
 import { toast } from "sonner";
+import { getMaybeImageUrl } from "./utils";
 
 export type ProductWithDetails = Awaited<
   NonNullable<ReturnType<typeof productQueries.getProduct>>
@@ -61,7 +62,7 @@ const getProductDefaultsByEan = (product: ProductWithDetails, ean?: string) => {
   };
 };
 
-export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
+export const ProductDetails = async ({ product, ean }: ProductDetailsProps) => {
   if (!product) return null;
 
   const { defaultColor, defaultSize } = getProductDefaultsByEan(product, ean);
@@ -109,6 +110,12 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
     return "Add to cart";
   };
 
+  const imageUrl = product?.colors
+    .flatMap((color) => color.imageUrl)
+    .filter((url) => url?.includes(selectedColor))[0];
+
+  const imageSupabasePath = getMaybeImageUrl(product.name, selectedColor);
+
   const onSubmit = async (data: ProductDetailsFormData) => {
     const selectedColor = product.colors.find((c) => c.color === data.color);
     const selectedSize = selectedColor?.sizes.find((s) => s.size === data.size);
@@ -131,10 +138,7 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
     <Card className="mx-auto w-full max-w-3xl">
       <div className="flex gap-4">
         <div className="flex w-1/2 items-center justify-center p-8">
-          <img
-            src="https://alfxflqvzegvbpsvtzih.supabase.co/storage/v1/object/public/photos/2018_patti_grafit.png"
-            alt={product.name}
-          />
+          <img src={imageUrl ?? imageSupabasePath} alt={product.name} />
         </div>
         <div className="flex w-1/2 flex-col justify-center">
           <CardHeader className="pb-4">
