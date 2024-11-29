@@ -1,5 +1,4 @@
-import { createTransport } from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { createTransport, TransportOptions, SentMessageInfo } from "nodemailer";
 import { env } from "~/env";
 
 interface SendMailParams {
@@ -17,9 +16,9 @@ export const sendMail = async ({
   subject,
   body,
   attachments,
-}: SendMailParams): Promise<SMTPTransport.SentMessageInfo> => {
+}: SendMailParams): Promise<SentMessageInfo> => {
   const transport = createTransport({
-    host: env.NEXT_PUBLIC_SMTP_HOST,
+    host: env.NEXT_PUBLIC_SMTP_HOST || "smtp.gmail.com",
     port: env.NEXT_PUBLIC_SMTP_PORT,
     secure: true,
     auth: {
@@ -29,7 +28,7 @@ export const sendMail = async ({
     tls: {
       rejectUnauthorized: true,
     },
-  });
+  } as TransportOptions);
 
   await transport.verify();
 
