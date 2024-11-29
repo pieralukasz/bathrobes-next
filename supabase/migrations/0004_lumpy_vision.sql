@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "price" numeric(10, 2) DEFAULT '60.00' NOT NULL;

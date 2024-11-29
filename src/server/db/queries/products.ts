@@ -40,6 +40,7 @@ export const productQueries = {
         if (categoryId) {
           return eq(products.categoryId, categoryId);
         }
+
         if (searchValue) {
           return or(
             like(products.name, `%${searchValue}%`),

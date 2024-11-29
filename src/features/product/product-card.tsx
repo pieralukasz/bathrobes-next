@@ -48,7 +48,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           />
         </div>
         <div className="p-2 text-center">
-          <p className="truncate font-semibold">{product.name}</p>
+          <p className="truncate text-sm font-semibold">{product.name}</p>
         </div>
       </CardContent>
     </Card>

@@ -5,6 +5,7 @@ import {
   boolean,
   index,
   unique,
+  decimal, // Added decimal import
 } from "drizzle-orm/pg-core";
 import { timestampColumns } from "./timestamp";
 
@@ -37,6 +38,9 @@ export const products = pgTable(
       .notNull(),
     isFeatured: boolean("is_featured").default(false).notNull(),
     isNewArrival: boolean("is_new_arrival").default(false).notNull(),
+    price: decimal("price", { precision: 10, scale: 2 })
+      .default("60.00")
+      .notNull(),
     ...timestampColumns,
   },
   (table) => ({

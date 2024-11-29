@@ -12,8 +12,9 @@ import { getUser as getUserSupabase } from "~/lib/supabase/server";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "~/lib/constants";
 import { createOrderSchema } from "./schema";
+import { env } from "../../env";
 
-const formatOrderDetails = async (orderId: number, userId: string) => {
+const formatOrderDetailsToClient = async (orderId: number, userId: string) => {
   const order = await orderQueries.getOrderByIdAndUserId(orderId, userId);
 
   if (!order) {
@@ -39,9 +40,33 @@ const formatOrderDetails = async (orderId: number, userId: string) => {
   `;
 };
 
+const formatOrderDetailsToAdmin = async (orderId: number, email: string) => {
+  const order = await orderQueries.getOrderById(orderId);
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  return `
+    <h1>New Order #${order.id} from ${email}</h1>
+    <ul>
+      ${order.items
+        .map(
+          (item) => `
+        <li>
+          ${item.productSize.color.product.name} / ${item.productSize.color.color} / ${item.productSize.size} / ${item.quantity}
+        </li>
+      `,
+        )
+        .join("")}
+    </ul>
+    ${order.note ? `<p>Note: ${order.note}</p>` : ""}
+  `;
+};
+
 export const sendOrder = async (
   orderId: number,
-): Promise<SMTPTransport.SentMessageInfo> => {
+): Promise<[SMTPTransport.SentMessageInfo, SMTPTransport.SentMessageInfo]> => {
   const user = await getUser();
 
   if (!user?.email) {
@@ -53,13 +78,18 @@ export const sendOrder = async (
     throw new Error("Order not found");
   }
 
-  const emailBody = await formatOrderDetails(orderId, user.id);
+  const emailBodyToClient = await formatOrderDetailsToClient(orderId, user.id);
+  const emailBodyToAdmin = await formatOrderDetailsToAdmin(
+    orderId,
+    user?.email,
+  );
+
   const excelBuffer = await generateOrderExcel(order);
 
-  const dataResult = await sendMail({
-    to: user.email,
-    subject: `L&L Bathrobe #${orderId}`,
-    body: emailBody,
+  const dataResultToAdmin = await sendMail({
+    to: env.ADMIN_EMAIL,
+    subject: `New Order #${orderId}`,
+    body: emailBodyToAdmin,
     attachments: [
       {
         filename: `order-${orderId}.xlsx`,
@@ -68,11 +98,23 @@ export const sendOrder = async (
     ],
   });
 
-  if (!dataResult) {
+  const dataResultToClient = await sendMail({
+    to: user.email,
+    subject: `L&L Bathrobe #${orderId} from ${user.email}`,
+    body: emailBodyToClient,
+    attachments: [
+      {
+        filename: `order-${orderId}.xlsx`,
+        content: excelBuffer,
+      },
+    ],
+  });
+
+  if (!dataResultToClient || !dataResultToAdmin) {
     throw new Error("Failed to send email");
   }
 
-  return dataResult;
+  return [dataResultToClient, dataResultToAdmin];
 };
 
 export const checkoutAction = actionClient
