@@ -19,8 +19,8 @@ export const sendMail = async ({
   attachments,
 }: SendMailParams): Promise<SMTPTransport.SentMessageInfo> => {
   const transport = createTransport({
-    host: "mail.gmx.com",
-    port: 465,
+    host: env.NEXT_PUBLIC_SMTP_HOST,
+    port: env.NEXT_PUBLIC_SMTP_PORT,
     secure: true,
     auth: {
       user: env.NEXT_PUBLIC_SMTP_EMAIL,
