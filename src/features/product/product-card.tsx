@@ -30,13 +30,21 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     router.push(`/product/${product.slug}`);
   };
 
+  const productPrice =
+    Number(product.price) % 1 === 0 ? Number(product.price) : product.price;
+
   return (
     <Card
-      className="hover:scale-101 mx-auto w-full max-w-md transform cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg"
+      className="hover:scale-101 group relative mx-auto w-full max-w-md transform cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg"
       onClick={handleClick}
     >
       <CardContent className="p-0">
         <div className="relative flex h-52 w-full items-center justify-center">
+          <div className="absolute left-0 top-0 m-1">
+            <span className="bg-gray rounded px-2 py-1 text-xs text-gray-300">
+              {productPrice}
+            </span>
+          </div>
           <img
             src={availableImage || imageSupabasePath}
             defaultValue={defaultImageUrl}
@@ -48,7 +56,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           />
         </div>
         <div className="p-2 text-center">
-          <p className="truncate text-sm font-semibold">{product.name}</p>
+          <p className="truncate text-xs">{product.name}</p>
         </div>
       </CardContent>
     </Card>
