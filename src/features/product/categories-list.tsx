@@ -8,7 +8,7 @@ async function CategoriesList() {
   const categories = await productQueries.getCategories();
 
   const all = {
-    title: "All",
+    title: "Wszystkie",
     path: "/search",
   };
 

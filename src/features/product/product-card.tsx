@@ -39,7 +39,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       onClick={handleClick}
     >
       <CardContent className="p-0">
-        <div className="relative flex h-52 w-full items-center justify-center">
+        <div className="relative flex min-h-52 w-full items-center justify-center">
           <div className="absolute left-0 top-0 m-1">
             <span className="bg-gray rounded px-2 py-1 text-xs text-gray-300">
               {productPrice}
@@ -49,7 +49,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             src={availableImage || imageSupabasePath}
             defaultValue={defaultImageUrl}
             alt={product.name}
-            className="h-full w-full object-cover"
+            // className="h-full w-full object-cover"
             onError={(e) => {
               e.currentTarget.src = defaultImageUrl;
             }}
