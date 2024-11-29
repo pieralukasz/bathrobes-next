@@ -22,6 +22,10 @@ export default async function SearchPage(props: {
     searchValue,
   });
 
+  const visibleProducts = products.filter(
+    (product) => product.category.visible,
+  );
+
   return (
     <section>
       {products.length === 0 ? (
@@ -31,7 +35,7 @@ export default async function SearchPage(props: {
             : "No products found"}
         </p>
       ) : (
-        <ProductsList products={products} />
+        <ProductsList products={visibleProducts} />
       )}
     </section>
   );
