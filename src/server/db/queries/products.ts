@@ -1,5 +1,5 @@
 import { db } from "..";
-import { eq, like, or, and } from "drizzle-orm";
+import { eq, like, or, and, sql } from "drizzle-orm";
 
 export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
@@ -52,6 +52,8 @@ export const productQueries = {
       },
       orderBy: (products, { desc, asc }) => [
         reverse ? desc(products[sortKey]) : asc(products[sortKey]),
+        // Use SQL natural sort for product names
+        sql`NULLIF(regexp_replace(${products.name}, '\D', '', 'g'), '')::int`,
         asc(products.name),
       ],
       with: {
