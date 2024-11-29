@@ -13,9 +13,9 @@ export function OrdersList({ orders }: OrdersListProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col items-center justify-center gap-6">
+    <div className="mx-auto flex w-full max-w-lg flex-col items-center justify-center gap-6 pb-10">
       <h1 className="text-2xl font-bold">Your Orders</h1>
-      <div className="w-full space-y-4 overflow-y-auto px-4">
+      <div className="max-h-80 w-full space-y-4 overflow-y-auto px-4">
         {orders.map((order) => (
           <Link
             key={order.id}
