@@ -13,6 +13,7 @@ interface ProductCardProps {
 export const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
 
+  console.log(product?.colors);
   const availableImage = product?.colors
     .flatMap((color) => color.imageUrl)
     .filter((url) => url)[0];
@@ -38,8 +39,8 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       className="hover:scale-101 group relative mx-auto w-full max-w-md transform cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg"
       onClick={handleClick}
     >
-      <CardContent className="p-0">
-        <div className="relative flex min-h-52 w-full items-center justify-center">
+      <CardContent className="flex h-full flex-col p-0">
+        <div className="relative flex min-h-52 w-full items-center justify-between">
           <div className="absolute left-0 top-0 m-1">
             <span className="bg-gray rounded px-2 py-1 text-xs text-gray-300">
               {productPrice}
@@ -49,13 +50,12 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             src={availableImage || imageSupabasePath}
             defaultValue={defaultImageUrl}
             alt={product.name}
-            // className="h-full w-full object-cover"
             onError={(e) => {
               e.currentTarget.src = defaultImageUrl;
             }}
           />
         </div>
-        <div className="p-2 text-center">
+        <div className="mt-auto p-2 text-center">
           <p className="truncate text-xs">{product.name}</p>
         </div>
       </CardContent>

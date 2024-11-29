@@ -52,6 +52,7 @@ export const productQueries = {
       },
       orderBy: (products, { desc, asc }) => [
         reverse ? desc(products[sortKey]) : asc(products[sortKey]),
+        asc(products.name),
       ],
       with: {
         category: true,
