@@ -16,11 +16,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    await seedDatabase();
-    console.log("Database seeding completed successfully");
+    seedDatabase();
     return Response.json({
       success: true,
-      message: "Database seeded successfully",
+      message: "Database seeding started",
     });
   } catch (error) {
     console.error("Error seeding database:", error);
