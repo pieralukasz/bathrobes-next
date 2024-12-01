@@ -1,5 +1,10 @@
 import { db } from "..";
-import { eq, like, or, and, sql } from "drizzle-orm";
+import { eq, like, or, and } from "drizzle-orm";
+import {
+  unstable_cacheLife as cacheLife,
+  unstable_cacheTag as cacheTag,
+} from "next/cache";
+import { delay } from "../../../lib/utils";
 
 export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
@@ -15,6 +20,9 @@ export const productQueries = {
   },
 
   getCategories: async () => {
+    "use cache";
+    cacheTag("categories");
+
     return await db.query.categories.findMany({
       where: (categories) => eq(categories.visible, true),
       orderBy: (categories, { asc }) => asc(categories.name),
@@ -35,6 +43,11 @@ export const productQueries = {
     reverse?: boolean;
     searchValue?: string;
   }) => {
+    // "use cache";
+    // cacheTag("products");
+
+    // TODO: remember to revalidate it always after updating the database
+
     return await db.query.products.findMany({
       where: (products) => {
         if (categoryId) {
@@ -66,6 +79,9 @@ export const productQueries = {
   },
 
   getProduct: async (id: number) => {
+    "use cache";
+    cacheTag(`product-${id}`);
+
     return await db.query.products.findFirst({
       where: (products) => eq(products.id, id),
       with: {
@@ -93,6 +109,9 @@ export const productQueries = {
   },
 
   getProductBySlug: async (slug: string) => {
+    "use cache";
+    cacheTag(`product-${slug}`);
+
     return await db.query.products.findFirst({
       where: (products) => eq(products.slug, slug),
       with: {

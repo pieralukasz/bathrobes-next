@@ -1,10 +1,10 @@
-"use client";
+"use cache";
 
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { CheckCircle } from "lucide-react";
 
-export default function ThankYouPage() {
+export default async function ThankYouPage() {
   return (
     <div className="container relative mx-auto flex min-h-[50vh] flex-col items-center justify-center gap-8 py-16 text-center">
       <div className="flex flex-col items-center gap-4">

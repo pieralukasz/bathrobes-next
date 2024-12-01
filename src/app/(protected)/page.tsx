@@ -12,6 +12,7 @@ export default async function HomePage() {
           alt="logo"
           width="128"
           height="128"
+          priority
           className="rounded-md"
         />
       </div>

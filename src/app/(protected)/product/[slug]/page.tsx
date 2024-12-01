@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { use } from "react";
 import { ProductDetails } from "~/features/product/product-details";
 import { productQueries } from "~/server/db/queries";
 
