@@ -29,6 +29,7 @@ jobs:
         run: |
           npm pkg delete scripts.prepare
           npm ci --legacy-peer-deps
+          npm install -g tsx
 
       - name: Create env file
         run: |
