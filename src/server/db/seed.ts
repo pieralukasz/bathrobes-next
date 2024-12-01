@@ -31,8 +31,6 @@ async function seed() {
 
     if (!categoryId) {
       throw new Error(`Category not found: ${categoryName}`);
-    } else {
-      console.log(`Inserted/Found category ID: ${categoryId}`);
     }
 
     const [product] = await db
@@ -53,8 +51,6 @@ async function seed() {
 
     if (!productId || !productName) {
       throw new Error(`Product not found: ${name}`);
-    } else {
-      console.log(`Inserted/Found product ${name}: ${productId}`);
     }
 
     const [productColor] = await db
@@ -70,8 +66,6 @@ async function seed() {
 
     if (!colorId) {
       throw new Error(`Color not found: ${color}`);
-    } else {
-      console.log(`Inserted/Found color ID: ${colorId}`);
     }
 
     await db
@@ -88,8 +82,6 @@ async function seed() {
       });
 
     productSizesProcessed.add(ean);
-
-    console.log(`Inserted size for color ID ${colorId}, EAN ${ean}`);
   }
 
   await db
