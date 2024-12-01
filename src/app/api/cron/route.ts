@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
+import { seedDatabase } from "~/server/db/seed";
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   console.log("Received request to /api/cron");
 
   const authHeader = request.headers.get("authorization");
@@ -14,6 +15,18 @@ export function GET(request: NextRequest) {
     });
   }
 
-  console.log("Authorized cron job executed successfully");
-  return Response.json({ success: "I am cron" });
+  try {
+    await seedDatabase();
+    console.log("Database seeding completed successfully");
+    return Response.json({
+      success: true,
+      message: "Database seeded successfully",
+    });
+  } catch (error) {
+    console.error("Error seeding database:", error);
+    return Response.json(
+      { success: false, message: "Failed to seed database" },
+      { status: 500 },
+    );
+  }
 }
