@@ -20,8 +20,11 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Compile TypeScript
+        run: npx tsc
+
       - name: Run seeding script
-        run: npx ts-node --esm ./scripts/run-seed.ts
+        run: npx ts-node --esm ./scripts/run-seed.js
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           XML_URL: ${{ secrets.XML_URL }}
