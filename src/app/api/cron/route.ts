@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    await seedDatabase();
+    seedDatabase();
     return Response.json({
       success: true,
       message: "Database seeding started",
