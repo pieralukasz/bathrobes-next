@@ -13,6 +13,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       XML_URL: ${{ secrets.XML_URL }}
       NODE_ENV: production
+      HUSKY: 0 # Disable husky in CI
 
     steps:
       - name: Checkout repository
@@ -25,7 +26,9 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: |
+          npm pkg delete scripts.prepare
+          npm ci --legacy-peer-deps
 
       - name: Run database seed
         run: npm run db:seed
