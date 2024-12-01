@@ -2,19 +2,18 @@ import { type NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  console.log("[Middleware] Middleware disabled for debugging.");
-  return new Response(null);
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/api/cron") {
+    console.log("[Middleware] Skipping /api/cron.");
+    return new Response(null);
+  }
+
+  await updateSession(request);
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/cron$|api/cron/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
