@@ -1,11 +1,11 @@
-# Next.js with Supabase and Drizzle
+# Next.js 15.0.4 with Supabase and Drizzle
 
 This project is a modern web application built with Next.js, Supabase, and Drizzle ORM. It features a robust authentication system and a product catalog.
 
 ## Features
 
 - **TypeScript**: Fully typed for better developer experience and code reliability.
-- **Next.js App Router**: Utilizes the latest Next.js features for efficient routing and rendering.
+- **Next.js 15.0.4 App Router**: Utilizes the latest Next.js features for efficient routing and rendering. (with use-cache)
 - **Supabase Authentication**: Implements a secure sign-in system using Supabase.
 - **Drizzle ORM**: Integrates Drizzle for database operations with PostgreSQL.
 - **Tailwind CSS**: Styled with Tailwind CSS for a responsive and customizable UI.
@@ -26,9 +26,7 @@ This project is a modern web application built with Next.js, Supabase, and Drizz
 2. Install dependencies:
    npm install
 
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-   DATABASE_URL=[your-supabase-database-url] (or it doesn't matter if supabase, just use postgresql url)
+3. Set up environment variables as it is from .env.template file.
 
 4. Run the development server:
    npm run dev
