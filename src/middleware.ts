@@ -2,7 +2,8 @@ import { type NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  console.log("[Middleware] Middleware disabled for debugging.");
+  return new Response(null);
 }
 
 export const config = {
