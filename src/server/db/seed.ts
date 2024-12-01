@@ -96,5 +96,6 @@ async function seed() {
 }
 
 export async function seedDatabase() {
+  console.log("I'm working");
   return seed();
 }
