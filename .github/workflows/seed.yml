@@ -21,7 +21,7 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Run seeding script
-        run: npx ts-node ./scripts/run-seed.ts
+        run: npx ts-node --esm ./scripts/run-seed.ts
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           XML_URL: ${{ secrets.XML_URL }}
