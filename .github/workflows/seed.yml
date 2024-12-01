@@ -1,0 +1,27 @@
+name: Run Seed Database
+
+on:
+  workflow_dispatch: # Allows manual triggers
+  schedule:
+    - cron: "*/15 * * * *" # Every 15 minutes
+
+jobs:
+  seed-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run seeding script
+        run: node ./scripts/run-seed.ts
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          XML_URL: ${{ secrets.XML_URL }}
