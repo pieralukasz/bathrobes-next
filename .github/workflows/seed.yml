@@ -1,40 +1,40 @@
-name: Database Seed
+# name: Database Seed
 
-on:
-  schedule:
-    - cron: "*/15 * * * *" # Runs every 15 minutes
-  workflow_dispatch: # Allows manual trigger
+# on:
+#   schedule:
+#     - cron: "*/15 * * * *" # Runs every 15 minutes
+#   workflow_dispatch: # Allows manual trigger
 
-jobs:
-  seed:
-    name: Seed Database
-    runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      XML_URL: ${{ secrets.XML_URL }}
-      NODE_ENV: production
-      HUSKY: 0 # Disable husky in CI
+# jobs:
+#   seed:
+#     name: Seed Database
+#     runs-on: ubuntu-latest
+#     env:
+#       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#       XML_URL: ${{ secrets.XML_URL }}
+#       NODE_ENV: production
+#       HUSKY: 0 # Disable husky in CI
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: "20"
+#           cache: "npm"
 
-      - name: Install dependencies
-        run: |
-          npm pkg delete scripts.prepare
-          npm ci --legacy-peer-deps
-          npm install -g tsx
+#       - name: Install dependencies
+#         run: |
+#           npm pkg delete scripts.prepare
+#           npm ci --legacy-peer-deps
+#           npm install -g tsx
 
-      - name: Create env file
-        run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "XML_URL=${{ secrets.XML_URL }}" >> .env
+#       - name: Create env file
+#         run: |
+#           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+#           echo "XML_URL=${{ secrets.XML_URL }}" >> .env
 
-      - name: Run database seed
-        run: npm run db:seed
+#       - name: Run database seed
+#         run: npm run db:seed
