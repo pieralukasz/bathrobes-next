@@ -1,10 +1,11 @@
 import { db } from "..";
-import { eq, like, or, and } from "drizzle-orm";
+import { eq, like, or, and, exists, gt } from "drizzle-orm";
 import {
   unstable_cacheLife as cacheLife,
   unstable_cacheTag as cacheTag,
 } from "next/cache";
 import { delay } from "../../../lib/utils";
+import { productColors, productSizes } from "../schema";
 
 export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
@@ -48,22 +49,49 @@ export const productQueries = {
     "use cache";
     cacheTag("products");
 
-    // TODO: remember to revalidate it always after updating the database
-
     return await db.query.products.findMany({
       where: (products) => {
+        const conditions = [];
+
         if (categoryId) {
-          return eq(products.categoryId, categoryId);
+          conditions.push(eq(products.categoryId, categoryId));
         }
 
         if (searchValue) {
-          return or(
-            like(products.name, `%${searchValue}%`),
-            like(products.description || "", `%${searchValue}%`),
-            like(products.slug, `%${searchValue}%`),
+          conditions.push(
+            or(
+              like(products.name, `%${searchValue}%`),
+              like(products.description || "", `%{searchValue}%`),
+              like(products.slug, `%${searchValue}%`),
+            ),
           );
         }
-        return undefined;
+
+        conditions.push(
+          exists(
+            db
+              .select()
+              .from(productSizes)
+              .where(
+                and(
+                  gt(productSizes.quantity, 0),
+                  exists(
+                    db
+                      .select()
+                      .from(productColors)
+                      .where(
+                        and(
+                          eq(productColors.productId, products.id),
+                          eq(productSizes.colorId, productColors.id),
+                        ),
+                      ),
+                  ),
+                ),
+              ),
+          ),
+        );
+
+        return conditions.length > 1 ? and(...conditions) : conditions[0];
       },
       orderBy: (products, { desc, asc }) => [
         reverse ? desc(products[sortKey]) : asc(products[sortKey]),
@@ -84,8 +112,32 @@ export const productQueries = {
     "use cache";
     cacheTag(`product-${id}`);
 
-    return await db.query.products.findFirst({
-      where: (products) => eq(products.id, id),
+    const product = await db.query.products.findFirst({
+      where: (products) =>
+        and(
+          eq(products.id, id),
+          exists(
+            db
+              .select()
+              .from(productSizes)
+              .where(
+                and(
+                  gt(productSizes.quantity, 0),
+                  exists(
+                    db
+                      .select()
+                      .from(productColors)
+                      .where(
+                        and(
+                          eq(productColors.productId, products.id),
+                          eq(productSizes.colorId, productColors.id),
+                        ),
+                      ),
+                  ),
+                ),
+              ),
+          ),
+        ),
       with: {
         category: true,
         colors: {
@@ -95,6 +147,8 @@ export const productQueries = {
         },
       },
     });
+
+    return product;
   },
 
   getColors: async (productId?: number) => {
