@@ -5,11 +5,28 @@ import { headers } from "next/headers";
 const SEED_SECRET = process.env.SEED_SECRET;
 
 export async function POST() {
-  const headersList = await headers();
+  const headersList = headers();
   const authorization = headersList.get("authorization");
 
-  if (!SEED_SECRET || authorization !== `Bearer ${SEED_SECRET}`) {
-    return new NextResponse("Unauthorized", { status: 401 });
+  if (!SEED_SECRET) {
+    return NextResponse.json(
+      { error: "SEED_SECRET environment variable not configured" },
+      { status: 500 },
+    );
+  }
+
+  if (!authorization) {
+    return NextResponse.json(
+      { error: "Missing Authorization header" },
+      { status: 401 },
+    );
+  }
+
+  if (authorization !== `Bearer ${SEED_SECRET}`) {
+    return NextResponse.json(
+      { error: "Invalid authorization token" },
+      { status: 401 },
+    );
   }
 
   try {
