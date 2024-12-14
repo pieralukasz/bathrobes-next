@@ -8,8 +8,9 @@ on:
 jobs:
   seed:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Trigger database seed
         run: |
-          curl -X POST https://llhurt.com/api/seed \
+          curl -X POST ${{ secrets.VERCEL_URL }}/api/seed \
           -H "Authorization: Bearer ${{ secrets.SEED_SECRET }}"
