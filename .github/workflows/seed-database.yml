@@ -11,5 +11,13 @@ jobs:
     steps:
       - name: Trigger database seed
         run: |
-          curl -X POST ${{ secrets.VERCEL_URL }}/api/seed \
-          -H "Authorization: Bearer ${{ secrets.SEED_SECRET }}"
+          response=$(curl -s -w "\n%{http_code}" -X POST ${{ secrets.VERCEL_URL }}/api/seed \
+            -H "Authorization: Bearer ${{ secrets.SEED_SECRET }})
+          status_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+          echo "Response body: $body"
+          echo "Status code: $status_code"
+          if [ "$status_code" != "200" ]; then
+            echo "Error: Seeding failed"
+            exit 1
+          fi
