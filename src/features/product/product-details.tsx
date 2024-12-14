@@ -72,16 +72,22 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
 
   if (!product) return null;
 
+  // Filter out colors that have no available sizes
+  const availableColors = product.colors.filter(
+    (color) => color.sizes.length > 0,
+  );
+
+  // Update the default values to use first available color
   const { defaultColor, defaultSize } = getProductDefaultsByEan(product, ean);
 
   const { cart, addCartItem } = useCart();
   const form = useForm<ProductDetailsFormData>({
     resolver: zodResolver(productDetailsFormSchema),
     defaultValues: {
-      color: defaultColor?.color || product.colors[0]?.color || "",
-      size: defaultSize?.size || product.colors[0]?.sizes[0]?.size || "",
+      color: defaultColor?.color || availableColors[0]?.color || "",
+      size: defaultSize?.size || availableColors[0]?.sizes[0]?.size || "",
       quantity: (() => {
-        const initialSize = defaultSize || product.colors[0]?.sizes[0];
+        const initialSize = defaultSize || availableColors[0]?.sizes[0];
 
         if (!cart || !initialSize) return 1;
 
@@ -99,25 +105,27 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
   const selectedSize = form.watch("size");
 
   const sizes = useMemo(() => {
-    const color = product.colors.find((color) => color.color === selectedColor);
+    const color = availableColors.find(
+      (color) => color.color === selectedColor,
+    );
     return color?.sizes ?? [];
-  }, [selectedColor, product.colors]);
+  }, [selectedColor, availableColors]);
 
   const existingCartItem = useMemo(() => {
     if (!cart || !selectedColor || !selectedSize) return null;
 
-    const color = product.colors.find((c) => c.color === selectedColor);
+    const color = availableColors.find((c) => c.color === selectedColor);
     const size = color?.sizes.find((s) => s.size === selectedSize);
 
     return cart.items.find((item) => item.productSizeId === size?.id);
-  }, [cart, selectedColor, selectedSize, product.colors]);
+  }, [cart, selectedColor, selectedSize, availableColors]);
 
   const getButtonText = () => {
     if (existingCartItem) return "Update cart";
     return "Add to cart";
   };
 
-  const imageUrl = product.colors.find(
+  const imageUrl = availableColors.find(
     (c) => c.color === selectedColor,
   )?.imageUrl;
 
@@ -126,7 +134,7 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
   }, [product.name, selectedColor]);
 
   const onSubmit = async (data: ProductDetailsFormData) => {
-    const selectedColor = product.colors.find((c) => c.color === data.color);
+    const selectedColor = availableColors.find((c) => c.color === data.color);
     const selectedSize = selectedColor?.sizes.find((s) => s.size === data.size);
 
     if (!selectedSize) return;
@@ -187,7 +195,7 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
                             value={field.value}
                             className="flex flex-wrap items-center gap-2"
                           >
-                            {product.colors.map((color) => (
+                            {availableColors.map((color) => (
                               <Label
                                 key={color.id}
                                 htmlFor={`color-${color.color}`}

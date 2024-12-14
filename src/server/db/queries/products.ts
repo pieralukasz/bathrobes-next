@@ -14,7 +14,7 @@ const hasAvailableQuantity = (products: any) =>
       .from(productSizes)
       .where(
         and(
-          gt(productSizes.quantity, 0),
+          gt(productSizes.quantity, 0), // This ensures quantity > 0
           exists(
             db
               .select()
@@ -111,7 +111,7 @@ export const productQueries = {
 
   getProduct: async (id: number) => {
     "use cache";
-    cacheTag(`product-${id}`);
+    cacheTag("products");
 
     const product = await db.query.products.findFirst({
       where: (products) =>
@@ -127,10 +127,11 @@ export const productQueries = {
 
   getProductBySlug: async (slug: string) => {
     "use cache";
-    cacheTag(`product-${slug}`);
+    cacheTag(`products`);
 
     const product = await db.query.products.findFirst({
-      where: (products) => eq(products.slug, slug),
+      where: (products) =>
+        and(eq(products.slug, slug), hasAvailableQuantity(products)),
       with: {
         category: true,
         colors: {
@@ -143,13 +144,7 @@ export const productQueries = {
       },
     });
 
-    return {
-      ...product,
-      colors:
-        product?.colors.filter((color) =>
-          color.sizes.some((size) => size.quantity > 0),
-        ) || [],
-    };
+    return product;
   },
 
   getProductRecommendations: async (categoryId: number) => {
