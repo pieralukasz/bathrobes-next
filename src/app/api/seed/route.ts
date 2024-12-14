@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 const SEED_SECRET = process.env.SEED_SECRET;
 
 export async function POST() {
-  const headersList = headers();
+  const headersList = await headers();
   const authorization = headersList.get("authorization");
 
   if (!SEED_SECRET) {
