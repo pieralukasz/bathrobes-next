@@ -11,5 +11,5 @@ jobs:
     steps:
       - name: Trigger database seed
         run: |
-          curl -X POST ${{ secrets.VERCEL_URL }}/api/seed \
+          curl -X POST https://llhurt.com/api/seed \
           -H "Authorization: Bearer ${{ secrets.SEED_SECRET }}"
