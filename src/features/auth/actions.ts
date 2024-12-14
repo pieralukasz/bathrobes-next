@@ -11,7 +11,7 @@ export const signInAction = actionClient
   .action(async ({ parsedInput: { email } }) => {
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.signInWithOtp({
+    await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
@@ -21,11 +21,7 @@ export const signInAction = actionClient
       },
     });
 
-    if (error) {
-      return redirect("/login");
-    }
-
-    return redirect("/");
+    return redirect("/login");
   });
 
 export const signOutAction = actionClient.action(async () => {
