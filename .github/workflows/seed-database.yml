@@ -2,7 +2,7 @@ name: Seed Database
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # Runs every 6 hours
+    - cron: "0 6-13 * * 1-5" # Runs hourly Mon-Fri 8am-3pm Polish time (UTC+2)
   workflow_dispatch:
 
 jobs:
