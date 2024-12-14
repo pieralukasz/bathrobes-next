@@ -10,6 +10,8 @@ export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
 export const productQueries = {
   getCategory: async (slug: string) => {
+    "use cache";
+    cacheTag("categories");
     return await db.query.categories.findFirst({
       where: (categories) =>
         and(eq(categories.slug, slug), eq(categories.visible, true)),
@@ -43,8 +45,8 @@ export const productQueries = {
     reverse?: boolean;
     searchValue?: string;
   }) => {
-    // "use cache";
-    // cacheTag("products");
+    "use cache";
+    cacheTag("products");
 
     // TODO: remember to revalidate it always after updating the database
 

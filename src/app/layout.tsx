@@ -13,9 +13,7 @@ import { User } from "@supabase/supabase-js";
 
 import { Loader } from "../components/ui/loader";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+import { defaultUrl } from "~/lib/url";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),

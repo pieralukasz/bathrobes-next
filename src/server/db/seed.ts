@@ -9,6 +9,8 @@ import {
 } from "./schema/products";
 import { inArray, not } from "drizzle-orm";
 
+import { defaultUrl } from "~/lib/url";
+
 async function seed() {
   const productsFromXML = await getXMLProducts();
   console.log(`Parsed ${productsFromXML.length} products from XML.`);
@@ -101,6 +103,15 @@ async function seed() {
     .where(not(inArray(productSizes.ean, Array.from(productSizesProcessed))));
 
   console.log(`Database seeded with ${productsFromXML.length} products 🌱`);
+
+  try {
+    await fetch(`${defaultUrl}/api/revalidate`, {
+      method: "POST",
+    });
+    console.log("Cache revalidated successfully");
+  } catch (error) {
+    console.warn("Failed to revalidate cache:", error);
+  }
 }
 
 export async function seedDatabase() {
