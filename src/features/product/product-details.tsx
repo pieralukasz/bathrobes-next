@@ -36,7 +36,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export type ProductWithDetails = Awaited<
-  NonNullable<ReturnType<typeof productQueries.getProduct>>
+  NonNullable<ReturnType<typeof productQueries.getProductBySlug>>
 >;
 
 interface ProductDetailsProps {
@@ -51,7 +51,7 @@ const getProductDefaultsByEan = (product: ProductWithDetails, ean?: string) => {
       defaultSize: null,
     };
 
-  const color = product?.colors.find((color) =>
+  const color = product?.colors?.find((color) =>
     color.sizes.some((size) => size.ean === ean),
   );
 
@@ -61,6 +61,10 @@ const getProductDefaultsByEan = (product: ProductWithDetails, ean?: string) => {
     defaultColor: color,
     defaultSize: size,
   };
+};
+
+const cleanSizeString = (size: string) => {
+  return size.replace(/['"]/g, "").trim();
 };
 
 export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
@@ -163,7 +167,7 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
           <div className="relative flex w-1/2 flex-col justify-center">
             <CardHeader className="pb-4">
               <CardTitle>{product.name}</CardTitle>
-              <CardDescription>{product.category.name}</CardDescription>
+              <CardDescription>{product.category?.name}</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -225,7 +229,7 @@ export const ProductDetails = ({ product, ean }: ProductDetailsProps) => {
                                   id={`size-${size.size}`}
                                   value={size.size}
                                 />
-                                {size.size}
+                                {cleanSizeString(size.size)}
                               </Label>
                             ))}
                           </RadioGroup>

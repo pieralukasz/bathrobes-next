@@ -16,6 +16,8 @@ export default async function ProductPage(props: {
 
   const product = await productQueries.getProductBySlug(slug);
 
+  console.log(product);
+
   if (!product) {
     notFound();
   }

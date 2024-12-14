@@ -7,6 +7,29 @@ import {
 import { delay } from "../../../lib/utils";
 import { productColors, productSizes } from "../schema";
 
+const hasAvailableQuantity = (products: any) =>
+  exists(
+    db
+      .select()
+      .from(productSizes)
+      .where(
+        and(
+          gt(productSizes.quantity, 0),
+          exists(
+            db
+              .select()
+              .from(productColors)
+              .where(
+                and(
+                  eq(productColors.productId, products.id),
+                  eq(productSizes.colorId, productColors.id),
+                ),
+              ),
+          ),
+        ),
+      ),
+  );
+
 export type SortKey = "createdAt" | "updatedAt" | "isNewArrival";
 
 export const productQueries = {
@@ -67,29 +90,7 @@ export const productQueries = {
           );
         }
 
-        conditions.push(
-          exists(
-            db
-              .select()
-              .from(productSizes)
-              .where(
-                and(
-                  gt(productSizes.quantity, 0),
-                  exists(
-                    db
-                      .select()
-                      .from(productColors)
-                      .where(
-                        and(
-                          eq(productColors.productId, products.id),
-                          eq(productSizes.colorId, productColors.id),
-                        ),
-                      ),
-                  ),
-                ),
-              ),
-          ),
-        );
+        conditions.push(hasAvailableQuantity(products));
 
         return conditions.length > 1 ? and(...conditions) : conditions[0];
       },
@@ -114,76 +115,50 @@ export const productQueries = {
 
     const product = await db.query.products.findFirst({
       where: (products) =>
-        and(
-          eq(products.id, id),
-          exists(
-            db
-              .select()
-              .from(productSizes)
-              .where(
-                and(
-                  gt(productSizes.quantity, 0),
-                  exists(
-                    db
-                      .select()
-                      .from(productColors)
-                      .where(
-                        and(
-                          eq(productColors.productId, products.id),
-                          eq(productSizes.colorId, productColors.id),
-                        ),
-                      ),
-                  ),
-                ),
-              ),
-          ),
-        ),
+        and(eq(products.id, id), hasAvailableQuantity(products)),
       with: {
         category: true,
-        colors: {
-          with: {
-            sizes: true,
-          },
-        },
+        colors: true,
       },
     });
 
     return product;
   },
 
-  getColors: async (productId?: number) => {
-    if (!productId) {
-      return [];
-    }
-
-    return await db.query.productColors.findMany({
-      where: (productColors) => eq(productColors.productId, productId),
-      with: {
-        sizes: true,
-      },
-    });
-  },
-
   getProductBySlug: async (slug: string) => {
     "use cache";
     cacheTag(`product-${slug}`);
 
-    return await db.query.products.findFirst({
+    const product = await db.query.products.findFirst({
       where: (products) => eq(products.slug, slug),
       with: {
         category: true,
         colors: {
           with: {
-            sizes: true,
+            sizes: {
+              where: (sizes) => gt(sizes.quantity, 0),
+            },
           },
         },
       },
     });
+
+    return {
+      ...product,
+      colors:
+        product?.colors.filter((color) =>
+          color.sizes.some((size) => size.quantity > 0),
+        ) || [],
+    };
   },
 
   getProductRecommendations: async (categoryId: number) => {
     return await db.query.products.findMany({
-      where: (products) => eq(products.categoryId, categoryId),
+      where: (products) =>
+        and(
+          eq(products.categoryId, categoryId),
+          hasAvailableQuantity(products),
+        ),
       with: {
         colors: {
           with: {
@@ -195,7 +170,3 @@ export const productQueries = {
     });
   },
 } as const;
-
-export type ProductWithCategoryAndColors = Awaited<
-  ReturnType<typeof productQueries.getProductBySlug>
->;

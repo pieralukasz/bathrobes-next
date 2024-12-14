@@ -3,7 +3,6 @@ import { eq } from "drizzle-orm";
 
 export const basketQueries = {
   getByUserId: async (userId: string) => {
-    "use cache";
     if (!userId) throw new Error("User ID is required");
 
     return await db.query.baskets.findFirst({
