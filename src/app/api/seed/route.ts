@@ -31,7 +31,9 @@ export async function POST() {
   }
 
   try {
-    await seedDatabase();
+    // await is not placed here because we don't need to wait for the response,
+    // better to return a response immediately after starting the seeding
+    seedDatabase();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Seed error:", error);
